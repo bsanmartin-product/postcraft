@@ -1,0 +1,2374 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PostCraft — LinkedIn Content Studio</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0d0f14;--bg2:#13161e;--bg3:#1a1e2a;--bg4:#222736;--surface:#1e2230;--surface2:#252a3a;--border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.14);--accent:#6c63ff;--accent2:#4ecdc4;--accent3:#ff6b6b;--amber:#f7b731;--text:#e8eaf0;--text2:#9aa0b8;--text3:#5a6080;--success:#4ecdc4;--r:12px;--rl:18px;--sb:252px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;overflow-x:hidden}
+
+/* AUTH */
+#auth-screen{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:9999}
+#auth-screen.hidden{display:none}
+.ac{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--rl);padding:34px;width:420px;max-width:95vw}
+.alogo{font-family:'Outfit',sans-serif;font-size:25px;font-weight:800;text-align:center;margin-bottom:3px;display:flex;align-items:center;justify-content:center;gap:8px}
+.adot{width:9px;height:9px;background:var(--accent);border-radius:50%}
+.asub{text-align:center;font-size:10px;color:var(--text3);margin-bottom:24px;letter-spacing:.07em;text-transform:uppercase}
+.atabs{display:flex;background:var(--bg3);border-radius:8px;padding:3px;margin-bottom:20px}
+.atab{flex:1;text-align:center;padding:7px;border-radius:6px;font-size:12px;cursor:pointer;color:var(--text2);transition:all .15s;font-weight:500}
+.atab.active{background:var(--surface2);color:var(--text)}
+.aform{display:none;flex-direction:column;gap:10px}
+.aform.active{display:flex}
+.albl{font-size:11px;color:var(--text2);margin-bottom:3px;font-weight:500}
+.ainp{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:9px 13px;color:var(--text);font-family:'Inter',sans-serif;font-size:13px;outline:none;transition:border-color .15s}
+.ainp:focus{border-color:var(--accent)}
+.abtn{background:var(--accent);color:#fff;border:none;border-radius:8px;padding:11px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Outfit',sans-serif;margin-top:4px;transition:background .15s}
+.abtn:hover{background:#7b74ff}
+.aerr{font-size:11px;color:var(--accent3);text-align:center;min-height:16px}
+.aok{font-size:11px;color:var(--success);text-align:center;min-height:16px}
+.alink{font-size:11px;color:var(--accent);text-align:center;cursor:pointer;text-decoration:underline}
+.ahr{height:1px;background:var(--border);margin:2px 0}
+
+/* SIDEBAR */
+.sidebar{width:var(--sb);min-height:100vh;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;z-index:100}
+.sb-logo{padding:18px 16px 14px;border-bottom:1px solid var(--border)}
+.logo-mark{font-family:'Outfit',sans-serif;font-size:19px;font-weight:800;display:flex;align-items:center;gap:7px}
+.logo-dot{width:7px;height:7px;background:var(--accent);border-radius:50%}
+.logo-sub{font-size:9px;color:var(--text3);letter-spacing:.07em;text-transform:uppercase;margin-top:2px}
+.sb-user{padding:9px 11px;margin:9px 9px 0;background:var(--bg3);border-radius:8px;display:flex;align-items:center;gap:7px;cursor:pointer}
+.sb-user:hover{background:var(--bg4)}
+.u-av{width:27px;height:27px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
+.u-nm{font-size:11px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.u-em{font-size:9px;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb-nav{padding:9px;flex:1}
+.nav-sec{margin-bottom:16px}
+.nav-lbl{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);padding:0 8px;margin-bottom:4px;font-weight:500}
+.nav-item{display:flex;align-items:center;gap:8px;padding:7px 9px;border-radius:7px;cursor:pointer;transition:all .15s;font-size:12px;color:var(--text2);position:relative}
+.nav-item:hover{background:var(--bg3);color:var(--text)}
+.nav-item.active{background:rgba(108,99,255,.15);color:var(--accent);font-weight:500}
+.nav-item.active::before{content:'';position:absolute;left:-9px;top:50%;transform:translateY(-50%);width:3px;height:60%;background:var(--accent);border-radius:0 3px 3px 0}
+.ni{width:13px;height:13px;opacity:.7;flex-shrink:0}
+.nav-item.active .ni{opacity:1}
+.nbadge{margin-left:auto;background:var(--accent);color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:8px}
+.sb-bot{padding:9px;border-top:1px solid var(--border)}
+.api-stat{background:var(--bg3);border-radius:7px;padding:8px 10px;display:flex;align-items:center;gap:7px;cursor:pointer}
+.api-stat:hover{background:var(--bg4)}
+.api-dot{width:6px;height:6px;border-radius:50%;background:var(--accent3);flex-shrink:0}
+
+/* MAIN */
+.main{margin-left:var(--sb);flex:1;min-height:100vh;display:flex;flex-direction:column;min-width:0;max-width:100%;overflow-x:hidden}
+.topbar{height:50px;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 22px;gap:10px;position:sticky;top:0;background:var(--bg);z-index:50;min-width:0}
+.tb-title{font-family:'Outfit',sans-serif;font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tb-sep{flex:1}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:6px 12px;border-radius:7px;font-size:12px;font-family:'Inter',sans-serif;cursor:pointer;transition:all .15s;border:none;font-weight:500}
+.btn-primary{background:var(--accent);color:#fff}.btn-primary:hover{background:#7b74ff}
+.btn-ghost{background:transparent;color:var(--text2);border:1px solid var(--border2)}.btn-ghost:hover{background:var(--bg3);color:var(--text)}
+.btn-danger{background:rgba(255,107,107,.12);color:var(--accent3);border:1px solid rgba(255,107,107,.25)}
+.btn-success{background:rgba(78,205,196,.12);color:var(--success);border:1px solid rgba(78,205,196,.25)}
+.btn-sm{padding:4px 9px;font-size:11px}
+.content{padding:22px;flex:1;min-width:0;overflow-x:hidden}
+.page{display:none}.page.active{display:block;min-width:0}
+
+/* CARDS / FORMS */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);padding:16px}
+.c-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.c-ttl{font-family:'Outfit',sans-serif;font-size:13px;font-weight:600}
+.mgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:11px;margin-bottom:18px}
+.mcard{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:13px 15px}
+.mlbl{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:5px}
+.mval{font-family:'Outfit',sans-serif;font-size:22px;font-weight:700}
+.msub{font-size:10px;color:var(--text3);margin-top:2px}
+.fgrp{margin-bottom:11px}
+.flbl{font-size:11px;color:var(--text2);margin-bottom:3px;display:block;font-weight:500}
+.finp,.fta,.fsel{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:8px 12px;color:var(--text);font-family:'Inter',sans-serif;font-size:12px;transition:border-color .15s;outline:none}
+.finp:focus,.fta:focus,.fsel:focus{border-color:var(--accent)}
+.fta{resize:vertical;min-height:80px;line-height:1.6}
+.fsel{cursor:pointer;appearance:none}
+
+/* MODAL */
+.modal-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:999;align-items:center;justify-content:center}
+.modal-ov.open{display:flex}
+.modal{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--rl);padding:22px;width:560px;max-width:95vw;max-height:90vh;overflow-y:auto}
+.mttl{font-family:'Outfit',sans-serif;font-size:16px;font-weight:700;margin-bottom:3px}
+.msub2{font-size:11px;color:var(--text2);margin-bottom:18px}
+
+/* POSTS */
+.pgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:11px}
+.pcard{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:12px;transition:all .15s}
+.pcard:hover{border-color:var(--border2)}
+.pcst{display:inline-flex;font-size:9px;padding:2px 6px;border-radius:4px;margin-bottom:7px;font-weight:600;letter-spacing:.04em;text-transform:uppercase}
+.st-draft{background:rgba(247,183,49,.12);color:var(--amber)}
+.st-pub{background:rgba(78,205,196,.12);color:var(--success)}
+.pctxt{font-size:11px;color:var(--text2);line-height:1.6;margin-bottom:8px;white-space:pre-wrap;word-break:break-word;max-height:120px;overflow:hidden}
+.pcmeta{display:flex;align-items:center;justify-content:space-between;font-size:10px;color:var(--text3)}
+.pcsty{background:var(--bg3);border-radius:3px;padding:1px 5px;font-size:9px;color:var(--text2)}
+.posts-tabs{display:flex;border-bottom:1px solid var(--border);margin-bottom:16px}
+.ptab{padding:7px 15px;font-size:12px;cursor:pointer;color:var(--text2);border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .15s;font-weight:500}
+.ptab.active{color:var(--accent);border-bottom-color:var(--accent)}
+
+/* HISTORY */
+.hist-item{display:flex;gap:10px;padding:12px 0;border-bottom:1px solid var(--border);cursor:pointer}
+.hist-item:hover .hist-body{color:var(--text)}
+.hist-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:4px}
+.hist-body{font-size:12px;color:var(--text2);line-height:1.5;flex:1;white-space:pre-line}
+.hist-meta{font-size:10px;color:var(--text3);margin-top:3px}
+.hist-actions{display:flex;gap:4px;margin-top:6px}
+
+/* PROFILES */
+.pgrid3{display:grid;grid-template-columns:repeat(3,1fr);gap:11px;margin-bottom:18px}
+.profcard{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);padding:14px;cursor:pointer;transition:all .15s;position:relative}
+.profcard:hover{border-color:var(--border2)}
+.profcard.pa{border-color:var(--accent);background:rgba(108,99,255,.06)}
+.profav{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;margin-bottom:9px}
+.profnm{font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;margin-bottom:2px}
+.profind{font-size:10px;color:var(--text3);margin-bottom:7px}
+.proftags{display:flex;flex-wrap:wrap;gap:3px}
+.proftag{background:var(--bg3);border-radius:3px;padding:2px 5px;font-size:9px;color:var(--text2)}
+.pabadge{position:absolute;top:10px;right:10px;background:rgba(108,99,255,.15);color:var(--accent);font-size:8px;font-weight:700;padding:2px 5px;border-radius:4px;text-transform:uppercase}
+.addpcard{background:transparent;border:1px dashed var(--border2);border-radius:var(--rl);padding:14px;cursor:pointer;transition:all .15s;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;min-height:130px;color:var(--text3)}
+.addpcard:hover{border-color:var(--accent);color:var(--accent)}
+
+/* FLOW */
+.fsteps{display:flex;align-items:center;margin-bottom:22px}
+.fstep{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text3);font-weight:500}
+.fstep.active{color:var(--text)}.fstep.done{color:var(--success)}
+.snum{width:21px;height:21px;border-radius:50%;background:var(--bg4);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:var(--text3);flex-shrink:0}
+.fstep.active .snum{background:var(--accent);color:#fff}
+.fstep.done .snum{background:var(--success);color:var(--bg)}
+.sconn{flex:0 0 26px;height:1px;background:var(--border);margin:0 3px}
+.sconn.done{background:var(--success)}
+.srcgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px}
+.srcc{border:1px solid var(--border);border-radius:var(--r);padding:12px;cursor:pointer;transition:all .15s;background:var(--surface);text-align:center}
+.srcc.sel{border-color:var(--accent);background:rgba(108,99,255,.08)}
+.srci{font-size:19px;margin-bottom:5px}
+.srcn{font-size:11px;font-weight:500}
+.srcd{font-size:9px;color:var(--text3);margin-top:1px}
+.styopts{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:14px}
+.stypill{border:1px solid var(--border);border-radius:var(--r);padding:8px 10px;cursor:pointer;transition:all .15s;background:var(--surface);text-align:center}
+.stypill.sel{border-color:var(--accent2);background:rgba(78,205,196,.08);color:var(--accent2)}
+.styn{font-size:11px;font-weight:500}
+.styd{font-size:9px;color:var(--text3);margin-top:1px}
+.stypill.sel .styd{color:rgba(78,205,196,.65)}
+
+/* GENERATED POSTS — full-width cards with inline editor */
+.gencard{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);overflow:hidden;transition:border-color .2s;min-width:0;width:100%;max-width:100%;box-sizing:border-box}
+.gencard:hover{border-color:var(--border2)}
+.gencard.selp{border-color:var(--accent)}
+.gen-card-header{display:flex;align-items:center;gap:10px;padding:13px 16px;border-bottom:1px solid var(--border);background:var(--bg3);flex-wrap:wrap;min-width:0}
+.gen-card-body{padding:16px;font-size:13px;color:var(--text2);line-height:1.8;white-space:pre-wrap;word-break:break-word;overflow-wrap:break-word;overflow:hidden;max-width:100%;box-sizing:border-box}
+.gen-card-actions{display:flex;gap:6px;padding:12px 16px;border-top:1px solid var(--border);flex-wrap:wrap;align-items:center}
+.gen-card-editor{display:none;padding:0 16px 16px;box-sizing:border-box;width:100%}
+.gen-card-editor textarea{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:10px 13px;color:var(--text);font-family:'Inter',sans-serif;font-size:13px;line-height:1.8;min-height:200px;resize:vertical;outline:none;white-space:pre-wrap;word-break:break-word;box-sizing:border-box;max-width:100%}
+.gen-card-editor textarea:focus{border-color:var(--accent)}
+.gen-card-editor-actions{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;align-items:center}
+/* Badge colors */
+.gbadge{display:inline-flex;font-size:9px;padding:2px 7px;border-radius:4px;font-weight:700;letter-spacing:.05em;text-transform:uppercase}
+.gstory{background:rgba(247,183,49,.12);color:var(--amber)}
+.gvalue{background:rgba(108,99,255,.12);color:var(--accent)}
+.gopin{background:rgba(255,107,107,.12);color:var(--accent3)}
+
+/* NEWS */
+.nbar{background:var(--bg3);border-radius:8px;padding:8px 12px;display:flex;align-items:center;gap:8px;margin-bottom:14px;font-size:11px;overflow:hidden}
+.ntag{background:var(--accent3);color:#fff;font-size:8px;font-weight:700;padding:2px 5px;border-radius:3px;letter-spacing:.07em;text-transform:uppercase;flex-shrink:0}
+.ntxt{color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1}
+.nrc{background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:11px;cursor:pointer;transition:border-color .15s;margin-bottom:6px}
+.nrc:hover{border-color:var(--accent)}
+.nrc.seln{border-color:var(--accent2);background:rgba(78,205,196,.05)}
+.nfilter{display:flex;gap:8px;margin-bottom:10px;align-items:center;font-size:11px;color:var(--text2);flex-wrap:wrap}
+.nfpill{padding:4px 10px;border-radius:20px;border:1px solid var(--border);cursor:pointer;font-size:10px;transition:all .15s;background:var(--surface)}
+.nfpill.active{border-color:var(--accent2);background:rgba(78,205,196,.1);color:var(--accent2)}
+
+/* QUESTIONS */
+.qitem{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:12px;margin-bottom:9px}
+.qlbl{font-size:9px;color:var(--accent2);font-weight:600;letter-spacing:.04em;text-transform:uppercase;margin-bottom:3px}
+.qtxt{font-size:12px;color:var(--text2);margin-bottom:7px;line-height:1.5}
+.qopt{font-size:10px;color:var(--text3);margin-top:4px}
+
+/* LOADER */
+.lov{display:none;flex-direction:column;align-items:center;justify-content:center;padding:48px;gap:11px}
+.lov.vis{display:flex}
+.loader{width:28px;height:28px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.ltxt{font-size:12px;color:var(--text2)}
+
+/* TONE CHIPS */
+.tonegrid{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-top:4px}
+.tonechip{border:1px solid var(--border);border-radius:5px;padding:6px 8px;cursor:pointer;font-size:10px;text-align:center;color:var(--text2);transition:all .15s}
+.tonechip.sel{border-color:var(--accent);background:rgba(108,99,255,.1);color:var(--accent)}
+
+/* TOAST */
+#toast{position:fixed;bottom:20px;right:20px;background:var(--surface2);border:1px solid var(--border2);border-radius:9px;padding:10px 15px;font-size:12px;z-index:9998;display:none;max-width:280px;box-shadow:0 8px 32px rgba(0,0,0,.4)}
+
+/* API keys page */
+.mopt{display:flex;gap:10px;padding:11px 13px;border:1px solid var(--border);border-radius:var(--r);margin-bottom:7px;max-width:620px}
+
+@media(max-width:900px){.mgrid{grid-template-columns:repeat(2,1fr)}.pgrid,.pgrid3,.gengrid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<!-- ══ AUTH ══ -->
+<div id="auth-screen">
+  <div class="ac">
+    <div class="alogo"><span class="adot"></span>PostCraft</div>
+    <div class="asub">LinkedIn Content Studio</div>
+    <div class="atabs">
+      <div class="atab active" onclick="switchAuth('login')">Iniciar sesión</div>
+      <div class="atab" onclick="switchAuth('register')">Registrarse</div>
+    </div>
+    <!-- LOGIN -->
+    <div class="aform active" id="af-login">
+      <div><div class="albl">Email</div><input class="ainp" id="li-e" type="email" placeholder="tu@email.com" autocomplete="email"></div>
+      <div><div class="albl">Contraseña</div><input class="ainp" id="li-p" type="password" placeholder="••••••••" autocomplete="current-password"></div>
+      <div class="aerr" id="li-err"></div>
+      <button class="abtn" onclick="doLogin()">Entrar</button>
+      <div class="ahr"></div>
+      <div class="alink" onclick="switchAuth('recover')">Olvidé mi contraseña</div>
+    </div>
+    <!-- REGISTER -->
+    <div class="aform" id="af-register">
+      <div><div class="albl">Nombre</div><input class="ainp" id="re-n" type="text" placeholder="Tu nombre"></div>
+      <div><div class="albl">Email</div><input class="ainp" id="re-e" type="email" placeholder="tu@email.com" autocomplete="email"></div>
+      <div><div class="albl">Contraseña</div><input class="ainp" id="re-p" type="password" placeholder="Mínimo 6 caracteres" autocomplete="new-password"></div>
+      <div><div class="albl">Confirmar contraseña</div><input class="ainp" id="re-p2" type="password" placeholder="Repetí la contraseña"></div>
+      <div class="aerr" id="re-err"></div>
+      <button class="abtn" onclick="doRegister()">Crear cuenta</button>
+    </div>
+    <!-- RECOVER -->
+    <div class="aform" id="af-recover">
+      <div style="font-size:12px;color:var(--text2);text-align:center">Ingresá tu email y se generará un código de recuperación.</div>
+      <div><div class="albl">Email</div><input class="ainp" id="rc-e" type="email" placeholder="tu@email.com"></div>
+      <div class="aerr" id="rc-err"></div>
+      <div class="aok" id="rc-ok"></div>
+      <button class="abtn" onclick="doRecover()">Generar código</button>
+      <div class="ahr"></div>
+      <div class="alink" onclick="switchAuth('reset')">Ya tengo un código →</div>
+      <div class="alink" onclick="switchAuth('login')">← Volver al login</div>
+    </div>
+    <!-- RESET -->
+    <div class="aform" id="af-reset">
+      <div><div class="albl">Email</div><input class="ainp" id="rs-e" type="email" placeholder="tu@email.com"></div>
+      <div><div class="albl">Código</div><input class="ainp" id="rs-c" type="text" placeholder="123456" maxlength="6" style="letter-spacing:.2em;font-size:17px;text-align:center"></div>
+      <div><div class="albl">Nueva contraseña</div><input class="ainp" id="rs-p" type="password" placeholder="Mínimo 6 caracteres"></div>
+      <div class="aerr" id="rs-err"></div>
+      <div class="aok" id="rs-ok"></div>
+      <button class="abtn" onclick="doReset()">Restablecer</button>
+      <div class="alink" onclick="switchAuth('login')">← Volver al login</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ APP ══ -->
+<aside class="sidebar">
+  <div class="sb-logo">
+    <div class="logo-mark"><span class="logo-dot"></span>PostCraft</div>
+    <div class="logo-sub">LinkedIn Studio</div>
+  </div>
+  <div class="sb-user" onclick="showUserMenu()">
+    <div class="u-av" id="sb-av">?</div>
+    <div style="overflow:hidden;min-width:0">
+      <div class="u-nm" id="sb-nm">—</div>
+      <div class="u-em" id="sb-em">—</div>
+    </div>
+  </div>
+  <nav class="sb-nav">
+    <div class="nav-sec">
+      <div class="nav-lbl">Overview</div>
+      <div class="nav-item active" onclick="navigate('home',this)"><svg class="ni" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 6.5L8 2l6 4.5V14a1 1 0 01-1 1H3a1 1 0 01-1-1V6.5z"/></svg>Inicio</div>
+      <div class="nav-item" onclick="navigate('dashboard',this)"><svg class="ni" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="8" width="3" height="6" rx="1"/><rect x="6.5" y="5" width="3" height="9" rx="1"/><rect x="11" y="2" width="3" height="12" rx="1"/></svg>Dashboard</div>
+    </div>
+    <div class="nav-sec">
+      <div class="nav-lbl">Contenido</div>
+      <div class="nav-item" onclick="navigate('posts-flow',this)"><svg class="ni" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6"/><path d="M8 5v6M5 8h6"/></svg>Nuevo Post<span class="nbadge">IA</span></div>
+      <div class="nav-item" onclick="navigate('my-posts',this)"><svg class="ni" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 2h10a1 1 0 011 1v10a1 1 0 01-1 1H3a1 1 0 01-1-1V3a1 1 0 011-1z"/><path d="M5 6h6M5 9h4"/></svg>Mis Posts<span class="nbadge" id="sb-db" style="background:var(--amber);color:var(--bg);display:none">0</span></div>
+      <div class="nav-item" onclick="navigate('history',this)"><svg class="ni" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6"/><path d="M8 5v3l2 2"/></svg>Historial</div>
+    </div>
+    <div class="nav-sec">
+      <div class="nav-lbl">Configuración</div>
+      <div class="nav-item" onclick="navigate('profiles',this)"><svg class="ni" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="5" r="3"/><path d="M2 14c0-3.314 2.686-6 6-6s6 2.686 6 6"/></svg>Perfiles</div>
+      <div class="nav-item" onclick="navigate('api-settings',this)"><svg class="ni" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="3"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2"/></svg>API Keys</div>
+    </div>
+  </nav>
+  <div class="sb-bot">
+    <div class="api-stat" onclick="navigate('api-settings',null)">
+      <div class="api-dot" id="sb-api-dot"></div>
+      <div>
+        <div style="font-size:11px;color:var(--text2)" id="sb-mod-nm">Sin modelo</div>
+        <div style="font-size:9px;color:var(--text3)" id="sb-mod-sub">configurá tu API key</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<main class="main">
+  <div class="topbar">
+    <div class="tb-title" id="tb-title">Inicio</div>
+    <div class="tb-sep"></div>
+    <span style="font-size:10px;color:var(--text3)" id="tb-prof"></span>
+    <button class="btn btn-ghost btn-sm" onclick="navigate('posts-flow',null)">+ Nuevo Post</button>
+    <button class="btn btn-ghost btn-sm" onclick="doLogout()">Salir</button>
+  </div>
+
+  <div class="content">
+
+    <!-- HOME -->
+    <div id="page-home" class="page active">
+      <div style="margin-bottom:18px">
+        <div style="font-family:'Outfit',sans-serif;font-size:21px;font-weight:700" id="home-greet">Bienvenido 👋</div>
+        <div style="font-size:12px;color:var(--text2);margin-top:4px" id="home-sub">Configurá tu API key y creá tu primer perfil para empezar.</div>
+      </div>
+      <!-- Ticker: pulled from NewsAPI on boot if key exists, otherwise static -->
+      <div class="nbar"><span class="ntag">Tendencias</span><span class="ntxt" id="n-ticker">Cargando...</span><span style="font-size:9px;color:var(--text3);flex-shrink:0" id="n-ticker-src"></span></div>
+      <div class="mgrid">
+        <div class="mcard"><div class="mlbl">Posts generados</div><div class="mval" id="hm-gen">0</div><div class="msub">total acumulado</div></div>
+        <div class="mcard"><div class="mlbl">Borradores</div><div class="mval" id="hm-dr">0</div><div class="msub">guardados</div></div>
+        <div class="mcard"><div class="mlbl">Perfil activo</div><div class="mval" style="font-size:13px;margin-top:4px" id="hm-prof">—</div><div class="msub" id="hm-profs">sin perfil</div></div>
+        <div class="mcard"><div class="mlbl">Modelo IA</div><div class="mval" style="font-size:12px;margin-top:4px" id="hm-mod">—</div><div class="msub" id="hm-mods">sin configurar</div></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1.5fr 1fr;gap:14px">
+        <div class="card">
+          <div class="c-hdr"><div class="c-ttl">Actividad reciente</div><button class="btn btn-ghost btn-sm" onclick="navigate('history',null)">Ver historial</button></div>
+          <div id="home-act"></div>
+        </div>
+        <div class="card">
+          <div class="c-hdr"><div class="c-ttl">Esta semana</div></div>
+          <div style="display:flex;align-items:flex-end;gap:4px;height:60px;margin-bottom:7px" id="week-chart"></div>
+          <div style="border-top:1px solid var(--border);padding-top:9px">
+            <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text2);margin-bottom:4px"><span>Objetivo</span><span style="color:var(--accent);font-weight:600" id="wk-prog">0/5</span></div>
+            <div style="background:var(--bg3);border-radius:4px;height:4px;overflow:hidden"><div id="wk-bar" style="background:var(--accent);width:0%;height:100%;border-radius:4px"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DASHBOARD -->
+    <div id="page-dashboard" class="page">
+      <div class="mgrid">
+        <div class="mcard"><div class="mlbl">Posts generados</div><div class="mval" id="d-gen">0</div></div>
+        <div class="mcard"><div class="mlbl">En historial</div><div class="mval" id="d-hist">0</div></div>
+        <div class="mcard"><div class="mlbl">Borradores</div><div class="mval" id="d-dr">0</div></div>
+        <div class="mcard"><div class="mlbl">Perfiles</div><div class="mval" id="d-pr">0</div></div>
+      </div>
+      <div style="display:grid;grid-template-columns:2fr 1fr;gap:14px">
+        <div class="card"><div class="c-hdr"><div class="c-ttl">Últimas generaciones</div></div><div id="d-recent"></div></div>
+        <div class="card"><div class="c-hdr"><div class="c-ttl">Por estilo</div></div><div id="d-styles"></div></div>
+      </div>
+    </div>
+
+    <!-- MY POSTS -->
+    <div id="page-my-posts" class="page">
+      <div class="posts-tabs">
+        <div class="ptab active" onclick="switchPTab(this,'drafts')">Borradores (<span id="tc-d">0</span>)</div>
+        <div class="ptab" onclick="switchPTab(this,'published')">Publicados (<span id="tc-p">0</span>)</div>
+      </div>
+      <div id="tab-drafts">
+        <div id="dg" class="pgrid"></div>
+        <div id="d-empty" style="text-align:center;padding:48px;color:var(--text3);display:none">
+          <div style="font-size:12px;margin-bottom:10px">No hay borradores guardados.</div>
+          <button class="btn btn-primary" onclick="navigate('posts-flow',null)">+ Crear post</button>
+        </div>
+      </div>
+      <div id="tab-published" style="display:none">
+        <div id="pub-g" class="pgrid"></div>
+        <div id="pub-empty" style="text-align:center;padding:48px;color:var(--text3);display:none"><div style="font-size:12px">No hay posts publicados.</div></div>
+      </div>
+    </div>
+
+    <!-- HISTORY -->
+    <div id="page-history" class="page">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+        <div>
+          <div style="font-family:'Outfit',sans-serif;font-size:16px;font-weight:700">Historial de posts</div>
+          <div style="font-size:11px;color:var(--text2);margin-top:2px">Todos los posts generados, guardados automáticamente</div>
+        </div>
+        <button class="btn btn-danger btn-sm" onclick="clearHistory()">Limpiar historial</button>
+      </div>
+      <!-- Filter bar -->
+      <div class="nfilter" style="margin-bottom:14px">
+        <span style="font-size:11px;color:var(--text3)">Filtrar:</span>
+        <div class="nfpill active" onclick="filterHist('all',this)">Todos</div>
+        <div class="nfpill" onclick="filterHist('Storytelling',this)">Storytelling</div>
+        <div class="nfpill" onclick="filterHist('Value Bomb',this)">Value Bomb</div>
+        <div class="nfpill" onclick="filterHist('Opinión',this)">Opinión</div>
+        <div class="nfpill" onclick="filterHist('Informativo',this)">Informativo</div>
+        <input class="finp" id="hist-search" placeholder="Buscar en historial..." style="width:180px;padding:4px 9px;font-size:11px" oninput="filterHist(null,null)">
+      </div>
+      <div id="hist-list"></div>
+      <div id="hist-empty" style="text-align:center;padding:48px;color:var(--text3);display:none">
+        <div style="font-size:36px;margin-bottom:10px">🕑</div>
+        <div style="font-size:13px;font-weight:500;margin-bottom:5px">El historial está vacío</div>
+        <div style="font-size:12px;margin-bottom:14px">Generá tu primer post para que aparezca aquí.</div>
+        <button class="btn btn-primary" onclick="navigate('posts-flow',null)">+ Crear post</button>
+      </div>
+    </div>
+
+    <!-- PROFILES -->
+    <div id="page-profiles" class="page">
+      <div style="margin-bottom:16px;display:flex;justify-content:space-between;align-items:center">
+        <div style="font-size:12px;color:var(--text2)">Cada perfil configura la voz, tono e industria con los que la IA genera tus posts. Máximo 3.</div>
+        <button class="btn btn-primary" onclick="openProfModal()">+ Nuevo perfil</button>
+      </div>
+      <div class="pgrid3" id="profiles-grid"></div>
+      <div id="profiles-empty" style="text-align:center;padding:56px;color:var(--text3);display:none">
+        <div style="font-size:36px;margin-bottom:10px">👤</div>
+        <div style="font-size:13px;font-weight:500;margin-bottom:5px">Sin perfiles</div>
+        <button class="btn btn-primary" onclick="openProfModal()">+ Crear perfil</button>
+      </div>
+    </div>
+
+    <!-- API SETTINGS -->
+    <div id="page-api-settings" class="page">
+      <div style="margin-bottom:18px">
+        <div style="font-family:'Outfit',sans-serif;font-size:16px;font-weight:700;margin-bottom:3px">API Keys y modelos</div>
+        <div style="font-size:11px;color:var(--text2)">Configurá tus claves, activá o desactivá cada modelo, y elegí cuál usar por defecto.</div>
+      </div>
+
+      <!-- MODELO ACTIVO SELECTOR -->
+      <div style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:14px;margin-bottom:18px;max-width:640px">
+        <div style="font-size:11px;font-weight:600;color:var(--text2);margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em">Modelo activo para generación</div>
+        <div style="display:flex;gap:7px;flex-wrap:wrap" id="model-selector">
+          <!-- populated by loadApiPage -->
+        </div>
+        <div style="font-size:10px;color:var(--text3);margin-top:8px">Solo los modelos con key cargada y activos aparecen disponibles. El seleccionado se usará siempre para generar posts.</div>
+      </div>
+
+      <!-- PROVIDERS -->
+      <div style="display:flex;flex-direction:column;gap:10px;max-width:640px" id="api-providers-list">
+        <!-- populated by loadApiPage -->
+      </div>
+
+      <div style="margin-top:14px;padding:11px;background:var(--bg3);border-radius:8px;font-size:10px;color:var(--text3);max-width:640px;line-height:1.8">
+        Claves guardadas solo en este navegador (localStorage). No se envían a ningún servidor externo.<br>
+        Desactivar un modelo no borra su key — solo lo excluye de la generación.
+      </div>
+      <div style="display:flex;gap:8px;margin-top:12px">
+        <button class="btn btn-primary" onclick="saveAllKeys()">Guardar claves</button>
+        <button class="btn btn-ghost" onclick="testActiveModel()">🔍 Probar modelo activo</button>
+      </div>
+      <div id="api-test-result" style="margin-top:10px;font-size:11px;display:none;padding:10px;border-radius:7px;max-width:640px"></div>
+    </div>
+
+    <!-- POSTS FLOW -->
+    <div id="page-posts-flow" class="page">
+      <div class="fsteps">
+        <div class="fstep active" id="fi-1"><div class="snum" id="fn-1">1</div><span>Fuente</span></div>
+        <div class="sconn" id="fc-1"></div>
+        <div class="fstep" id="fi-2"><div class="snum" id="fn-2">2</div><span>Noticias</span></div>
+        <div class="sconn" id="fc-2"></div>
+        <div class="fstep" id="fi-3"><div class="snum" id="fn-3">3</div><span>Personalizar</span></div>
+        <div class="sconn" id="fc-3"></div>
+        <div class="fstep" id="fi-4"><div class="snum" id="fn-4">4</div><span>Posts</span></div>
+      </div>
+
+      <!-- S1: TOPIC -->
+      <div id="fs-1">
+        <div style="margin-bottom:16px"><div style="font-family:'Outfit',sans-serif;font-size:17px;font-weight:700;margin-bottom:3px">¿Sobre qué querés escribir?</div></div>
+        <div class="srcgrid">
+          <div class="srcc sel" id="src-mytopic" onclick="selSrc('mytopic')"><div class="srci">💡</div><div class="srcn">Mi idea</div><div class="srcd">Idea, historia o notas</div></div>
+          <div class="srcc" id="src-linkedin" onclick="selSrc('linkedin')"><div class="srci">🔗</div><div class="srcn">LinkedIn</div><div class="srcd">Inspirate en un post</div></div>
+          <div class="srcc" id="src-youtube" onclick="selSrc('youtube')"><div class="srci">▶</div><div class="srcn">YouTube</div><div class="srcd">Convertir video en post</div></div>
+        </div>
+        <div id="si-mytopic">
+          <div class="fgrp"><label class="flbl">Escribí tu tema, idea o historia</label><textarea id="topic-in" class="fta" style="min-height:100px" placeholder="ej: Implementé una solución de IA en RRHH que redujo el tiempo de screening en un 78%. Quiero compartirlo como caso de éxito mostrando los desafíos del proceso y los resultados concretos..."></textarea></div>
+          <div style="font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;margin-bottom:8px">Estilo del post</div>
+          <div class="styopts">
+            <div class="stypill sel" id="sty-storytelling" onclick="selStyle('storytelling')"><div class="styn">Storytelling</div><div class="styd">Historia personal</div></div>
+            <div class="stypill" id="sty-valuebomb" onclick="selStyle('valuebomb')"><div class="styn">Value Bomb</div><div class="styd">Aprendizajes clave</div></div>
+            <div class="stypill" id="sty-opinion" onclick="selStyle('opinion')"><div class="styn">Opinión fuerte</div><div class="styd">Punto de vista</div></div>
+            <div class="stypill" id="sty-informativo" onclick="selStyle('informativo')"><div class="styn">Informativo</div><div class="styd">Datos y tendencias</div></div>
+          </div>
+          <div style="font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;margin-bottom:8px">Extensión del post</div>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:14px">
+            <div class="stypill" id="len-short" onclick="selLen('short')">
+              <div class="styn">Flash</div>
+              <div class="styd">~150 palabras</div>
+            </div>
+            <div class="stypill sel" id="len-medium" onclick="selLen('medium')">
+              <div class="styn">Estándar</div>
+              <div class="styd">~300 palabras</div>
+            </div>
+            <div class="stypill" id="len-long" onclick="selLen('long')">
+              <div class="styn">Extendido</div>
+              <div class="styd">~600 palabras</div>
+            </div>
+            <div class="stypill" id="len-xlong" onclick="selLen('xlong')">
+              <div class="styn">Artículo</div>
+              <div class="styd">~800 palabras</div>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <div class="fgrp">
+              <label class="flbl">Perfil activo</label>
+              <select id="fl-prof-sel" class="fsel"></select>
+              <div style="font-size:10px;color:var(--text3);margin-top:3px">Define la voz, industria y estilo de escritura del post</div>
+            </div>
+            <div class="fgrp">
+              <label class="flbl">Dato puntual de este post (opcional)</label>
+              <input id="extra-ctx" class="finp" placeholder="ej: empresa retail, 200 empleados, reducción del 78% en tiempo de proceso">
+              <div style="font-size:10px;color:var(--text3);margin-top:3px">Detalle específico de este caso que no está en el perfil</div>
+            </div>
+          </div>
+        </div>
+        <div id="si-linkedin" style="display:none"><div class="fgrp"><label class="flbl">URL del post de LinkedIn</label><input class="finp" placeholder="https://www.linkedin.com/posts/..."></div></div>
+        <div id="si-youtube" style="display:none"><div class="fgrp"><label class="flbl">URL del video de YouTube</label><input class="finp" placeholder="https://www.youtube.com/watch?v=..."></div></div>
+        <div style="margin-top:16px;display:flex;justify-content:flex-end"><button class="btn btn-primary" onclick="goStep(2)">Buscar noticias →</button></div>
+      </div>
+
+      <!-- S2: NEWS -->
+      <div id="fs-2" style="display:none">
+        <div style="margin-bottom:16px">
+          <div style="font-family:'Outfit',sans-serif;font-size:17px;font-weight:700;margin-bottom:3px">Noticias actuales sobre tu tema</div>
+          <div style="font-size:11px;color:var(--text2)">Buscá noticias recientes para enriquecer tu post. También podés pedir sugerencias de temas basados en tendencias. Es opcional — podés saltear.</div>
+        </div>
+
+        <!-- TOPIC SUGGESTIONS FROM TRENDS -->
+        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:14px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:8px">
+            <div>
+              <div style="font-size:12px;font-weight:600">✦ Sugerir temas de post basados en tendencias</div>
+              <div style="font-size:10px;color:var(--text3);margin-top:2px">La IA analiza noticias y tendencias actuales y propone ángulos de post para tu industria</div>
+            </div>
+            <button class="btn btn-ghost btn-sm" id="suggest-topics-btn" onclick="suggestTopics()">Generar sugerencias →</button>
+          </div>
+          <div id="topic-suggestions" style="display:none">
+            <div id="topic-suggestions-loading" style="display:none;text-align:center;padding:14px;color:var(--text3)">
+              <div class="loader" style="margin:0 auto 7px"></div>
+              <div style="font-size:11px">Analizando tendencias...</div>
+            </div>
+            <div id="topic-suggestions-list" style="display:flex;flex-direction:column;gap:7px"></div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:7px;margin-bottom:10px">
+          <input class="finp" id="news-q" placeholder="ej: IA en Recursos Humanos, Product Management 2025..." style="flex:1">
+          <button class="btn btn-primary" onclick="searchNews()">Buscar noticias</button>
+          <button class="btn btn-ghost" onclick="goStep(3)">Saltar →</button>
+        </div>
+        <!-- Date filter -->
+        <div class="nfilter">
+          <span>Período:</span>
+          <div class="nfpill active" id="nf-day" onclick="setNewsPeriod('day',this)">Últimas 24h</div>
+          <div class="nfpill" id="nf-week" onclick="setNewsPeriod('week',this)">Última semana</div>
+          <div class="nfpill" id="nf-month" onclick="setNewsPeriod('month',this)">Último mes</div>
+          <label style="display:flex;align-items:center;gap:4px;cursor:pointer;margin-left:8px"><input type="checkbox" id="use-newsapi" checked> NewsAPI</label>
+          <label style="display:flex;align-items:center;gap:4px;cursor:pointer"><input type="checkbox" id="use-rss" checked> Google News RSS</label>
+        </div>
+        <div id="news-loading" style="display:none;text-align:center;padding:24px;color:var(--text3)"><div class="loader" style="margin:0 auto 8px"></div><div style="font-size:11px">Buscando noticias recientes...</div></div>
+        <div id="news-res-list" style="max-height:340px;overflow-y:auto"></div>
+        <div id="news-sel-banner" style="display:none;background:rgba(78,205,196,.08);border:1px solid rgba(78,205,196,.2);border-radius:7px;padding:8px 12px;margin-top:9px;font-size:11px;color:var(--accent2)">✓ <span id="news-sel-count">0</span> noticia(s) seleccionada(s) · se incorporarán al post</div>
+        <div style="margin-top:14px;display:flex;justify-content:space-between">
+          <button class="btn btn-ghost" onclick="goStep(1)">← Volver</button>
+          <button class="btn btn-primary" onclick="goStep(3)">Personalizar →</button>
+        </div>
+      </div>
+
+      <!-- S3: QUESTIONS (topic-contextual) -->
+      <div id="fs-3" style="display:none">
+        <div style="margin-bottom:16px">
+          <div style="font-family:'Outfit',sans-serif;font-size:17px;font-weight:700;margin-bottom:3px">Preguntas sobre tu tema</div>
+          <div style="font-size:11px;color:var(--text2)">Respondé las que puedas. Más contexto = mejor resultado. Todas son opcionales.</div>
+        </div>
+        <div id="q-container"></div>
+        <div style="margin-top:14px;display:flex;justify-content:space-between">
+          <button class="btn btn-ghost" onclick="goStep(2)">← Volver</button>
+          <button class="btn btn-primary" onclick="goStep(4)">Generar posts ✦</button>
+        </div>
+      </div>
+
+      <!-- S4: RESULTS -->
+      <div id="fs-4" style="display:none">
+        <div class="lov" id="gen-load"><div class="loader"></div><div class="ltxt" id="gen-load-msg">Generando tus posts...</div></div>
+        <div id="gen-res" style="display:none">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px">
+            <div>
+              <div style="font-family:'Outfit',sans-serif;font-size:17px;font-weight:700;margin-bottom:2px">3 posts generados</div>
+              <div style="font-size:11px;color:var(--text2)">Cada post tiene su propio editor. Copiá, editá o guardá el que más te guste.</div>
+            </div>
+            <div style="display:flex;gap:7px;flex-wrap:wrap">
+              <button class="btn btn-ghost btn-sm" onclick="regenPosts()">↺ Regenerar otros 3</button>
+              <button class="btn btn-ghost btn-sm" onclick="goStep(1)">← Nuevo topic</button>
+            </div>
+          </div>
+          <!-- Cards: one per post, each with inline editor -->
+          <div style="display:flex;flex-direction:column;gap:14px" id="gen-grid"></div>
+        </div>
+      </div>
+    </div><!-- /posts-flow -->
+
+  </div><!-- /content -->
+</main>
+
+<!-- PROFILE MODAL -->
+<div class="modal-ov" id="prof-modal">
+  <div class="modal">
+    <div class="mttl" id="pm-ttl">Nuevo perfil</div>
+    <div class="msub2">La IA usará toda esta información para adaptar el tono y estilo de tus posts</div>
+    <input type="hidden" id="pm-id">
+    <div class="fgrp"><label class="flbl">Nombre del perfil *</label><input class="finp" id="pm-name" placeholder="ej: Bruno — PM Senior, Halyard"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px">
+      <div class="fgrp"><label class="flbl">Industria / Sector</label><input class="finp" id="pm-ind" placeholder="ej: SaaS, Fintech, RRHH"></div>
+      <div class="fgrp"><label class="flbl">Rol / Cargo</label><input class="finp" id="pm-role" placeholder="ej: Head of Product"></div>
+      <div class="fgrp"><label class="flbl">País / Región</label><input class="finp" id="pm-region" placeholder="ej: Argentina, España, Global"></div>
+    </div>
+    <div class="fgrp">
+      <label class="flbl">Tipo de perfil</label>
+      <div style="display:flex;gap:8px;margin-top:4px">
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:12px">
+          <input type="radio" name="pm-type" id="pm-type-personal" value="personal" checked> Profesional individual
+        </label>
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:12px">
+          <input type="radio" name="pm-type" id="pm-type-company" value="company"> Empresa / marca
+        </label>
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:12px">
+          <input type="radio" name="pm-type" id="pm-type-thought" value="thought"> Thought leader
+        </label>
+      </div>
+    </div>
+    <div class="fgrp"><label class="flbl">Descripción de voz y estilo</label><textarea class="fta" id="pm-voice" style="min-height:70px" placeholder="ej: Directo y reflexivo, primera persona, evito lenguaje corporativo, termino con preguntas..."></textarea></div>
+    <div class="fgrp"><label class="flbl">Audiencia objetivo</label><input class="finp" id="pm-aud" placeholder="ej: PMs, founders, directores de IT en LATAM"></div>
+    <div class="fgrp">
+      <label class="flbl">Tono (seleccioná los que apliquen)</label>
+      <div class="tonegrid">
+        <div class="tonechip" onclick="this.classList.toggle('sel')">Inspiracional</div>
+        <div class="tonechip" onclick="this.classList.toggle('sel')">Educativo</div>
+        <div class="tonechip" onclick="this.classList.toggle('sel')">Desafiante</div>
+        <div class="tonechip" onclick="this.classList.toggle('sel')">Empático</div>
+        <div class="tonechip" onclick="this.classList.toggle('sel')">Directo</div>
+        <div class="tonechip" onclick="this.classList.toggle('sel')">Analítico</div>
+      </div>
+    </div>
+    <div class="fgrp"><label class="flbl">Temas que dominás</label><input class="finp" id="pm-topics" placeholder="ej: Product Management, IA aplicada, datos, liderazgo"></div>
+    <div class="fgrp">
+      <label class="flbl">Material de referencia — posts, documentos, descripciones</label>
+      <div style="display:flex;gap:6px;margin-bottom:6px;align-items:center">
+        <button type="button" class="btn btn-ghost btn-sm" onclick="document.getElementById('pm-doc-input').click()">📎 Subir archivo (PDF, TXT, DOCX)</button>
+        <span style="font-size:10px;color:var(--text3)" id="pm-doc-status">El texto del archivo se agregará al campo de abajo</span>
+      </div>
+      <input type="file" id="pm-doc-input" accept=".txt,.pdf,.doc,.docx" style="display:none" onchange="handleDocUpload(event)">
+      <textarea class="fta" id="pm-examples" style="min-height:120px" placeholder="Pegá aquí posts que ya publicaste, descripción de la empresa, servicios, casos de éxito, o cualquier texto de referencia. La IA aprenderá la voz y el contexto de este perfil desde este material..."></textarea>
+    </div>
+    <div class="fgrp"><label class="flbl">Cosas a evitar</label><input class="finp" id="pm-avoid" placeholder="ej: no emojis en exceso, evitar lenguaje técnico, sin auto-promoción directa"></div>
+    <div id="pm-err" style="font-size:11px;color:var(--accent3);min-height:14px;margin-bottom:6px"></div>
+    <div style="display:flex;gap:6px;justify-content:flex-end;align-items:center">
+      <button id="pm-del" class="btn btn-danger btn-sm" onclick="deleteProfile()" style="display:none;margin-right:auto">Eliminar perfil</button>
+      <button class="btn btn-ghost" onclick="closeProfModal()">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveProfile()">Guardar perfil</button>
+    </div>
+  </div>
+</div>
+
+<!-- POST DETAIL MODAL -->
+<div class="modal-ov" id="hist-modal">
+  <div class="modal" style="width:640px">
+    <div class="mttl" id="hm-title">Post</div>
+    <div class="msub2" id="hm-meta"></div>
+    <textarea id="hm-body" class="fta" style="min-height:280px;font-size:12px;line-height:1.8;white-space:pre-wrap"></textarea>
+    <div style="display:flex;gap:6px;justify-content:flex-end;margin-top:12px;flex-wrap:wrap">
+      <button class="btn btn-ghost btn-sm" onclick="closeHistModal()">Cerrar</button>
+      <button class="btn btn-ghost btn-sm" onclick="copyHistPost()">⎘ Copiar</button>
+      <button class="btn btn-ghost btn-sm" onclick="saveHistAsDraft()">💾 Guardar borrador</button>
+      <button class="btn btn-danger btn-sm" onclick="deleteHistPost()">Eliminar</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════
+// PROVIDERS — each with its own API
+// ══════════════════════════════════════════
+const PROV = {
+  claude: { name:'Claude Sonnet 4', call: async (p,k) => {
+    const r = await fetch('https://api.anthropic.com/v1/messages', {method:'POST',headers:{'Content-Type':'application/json','x-api-key':k,'anthropic-version':'2023-06-01'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:2800,messages:[{role:'user',content:p}]})});
+    const d = await r.json(); if(d.error) throw new Error(d.error.message); return d.content?.[0]?.text||'';
+  }},
+  gpt4: { name:'GPT-4o', call: async (p,k) => {
+    const r = await fetch('https://api.openai.com/v1/chat/completions', {method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+k},body:JSON.stringify({model:'gpt-4o',max_tokens:2800,messages:[{role:'user',content:p}]})});
+    const d = await r.json(); if(d.error) throw new Error(d.error.message); return d.choices?.[0]?.message?.content||'';
+  }},
+  groq: { name:'Groq Llama 3.3', call: async (p,k) => {
+    const r = await fetch('https://api.groq.com/openai/v1/chat/completions', {method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+k},body:JSON.stringify({model:'llama-3.3-70b-versatile',max_tokens:2800,messages:[{role:'user',content:p}]})});
+    const d = await r.json(); if(d.error) throw new Error(JSON.stringify(d.error)); return d.choices?.[0]?.message?.content||'';
+  }},
+  gemini: { name:'Gemini 2.0 Flash', call: async (p,k) => {
+    const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${k}`, {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts:[{text:p}]}]})});
+    const d = await r.json(); if(d.error) throw new Error(d.error.message); return d.candidates?.[0]?.content?.parts?.[0]?.text||'';
+  }}
+};
+
+const getKeys = () => ({claude:ls('pc_key_claude'),gpt4:ls('pc_key_gpt4'),groq:ls('pc_key_groq'),gemini:ls('pc_key_gemini'),newsapi:ls('pc_key_newsapi')});
+
+// ══════════════════════════════════════════
+// STORAGE
+// ══════════════════════════════════════════
+const ls  = (k,v) => { if(v===undefined) return localStorage.getItem(k)||''; localStorage.setItem(k,v); };
+const lsJ = (k,v) => { if(v===undefined){try{return JSON.parse(localStorage.getItem(k)||'null')}catch{return null}} localStorage.setItem(k,JSON.stringify(v)); };
+const rmls = k => localStorage.removeItem(k);
+
+// ══════════════════════════════════════════
+// AUTH
+// ══════════════════════════════════════════
+let CU = null;
+const getUsers = () => lsJ('pc_users') || {};
+const saveUsers = u => lsJ('pc_users', u);
+const hash = p => { let h=0; for(let c of p){h=(h<<5)-h+c.charCodeAt(0);h|=0;} return h.toString(36); };
+
+function switchAuth(t) {
+  document.querySelectorAll('.atab').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.aform').forEach(x=>x.classList.remove('active'));
+  const tabs = document.querySelectorAll('.atab');
+  if(t==='login') tabs[0].classList.add('active');
+  else if(t==='register') tabs[1].classList.add('active');
+  document.getElementById('af-'+t)?.classList.add('active');
+  ['li-err','re-err','rc-err','rs-err'].forEach(id=>{ const e=document.getElementById(id); if(e){e.textContent='';} });
+  ['rc-ok','rs-ok'].forEach(id=>{ const e=document.getElementById(id); if(e) e.textContent=''; });
+}
+
+function doLogin() {
+  const email = document.getElementById('li-e').value.trim().toLowerCase();
+  const pass  = document.getElementById('li-p').value;
+  const err   = document.getElementById('li-err');
+  if(!email||!pass){err.textContent='Completá todos los campos.';return;}
+  const users = getUsers();
+  const u = users[email];
+  if(!u||u.pass!==hash(pass)){err.textContent='Email o contraseña incorrectos.';return;}
+  loginAs(u);
+}
+
+function doRegister() {
+  const name  = document.getElementById('re-n').value.trim();
+  const email = document.getElementById('re-e').value.trim().toLowerCase();
+  const pass  = document.getElementById('re-p').value;
+  const pass2 = document.getElementById('re-p2').value;
+  const err   = document.getElementById('re-err');
+  if(!name||!email||!pass){err.textContent='Completá todos los campos.';return;}
+  if(pass.length<6){err.textContent='La contraseña debe tener al menos 6 caracteres.';return;}
+  if(pass!==pass2){err.textContent='Las contraseñas no coinciden.';return;}
+  if(!/^[^@]+@[^@]+\.[^@]+$/.test(email)){err.textContent='Email inválido.';return;}
+  const users = getUsers();
+  if(users[email]){err.textContent='Este email ya está registrado.';return;}
+  const u = {email,name,pass:hash(pass),created:Date.now(),drafts:[],published:[],history:[],generated:0};
+  users[email]=u; saveUsers(users); loginAs(u);
+}
+
+function doRecover() {
+  const email = document.getElementById('rc-e').value.trim().toLowerCase();
+  const err = document.getElementById('rc-err'); const ok = document.getElementById('rc-ok');
+  if(!email){err.textContent='Ingresá tu email.';return;}
+  const users = getUsers();
+  if(!users[email]){err.textContent='No existe una cuenta con ese email.';return;}
+  const code = Math.floor(100000+Math.random()*900000).toString();
+  users[email].resetCode = code;
+  users[email].resetExpiry = Date.now()+600000;
+  saveUsers(users);
+  err.textContent='';
+  ok.textContent = `Código generado: ${code}  (en producción llegaría por email — copialo y usá "Ya tengo un código")`;
+  document.getElementById('rs-e').value = email;
+}
+
+function doReset() {
+  const email = document.getElementById('rs-e').value.trim().toLowerCase();
+  const code  = document.getElementById('rs-c').value.trim();
+  const pass  = document.getElementById('rs-p').value;
+  const err = document.getElementById('rs-err'); const ok = document.getElementById('rs-ok');
+  if(!email||!code||!pass){err.textContent='Completá todos los campos.';return;}
+  if(pass.length<6){err.textContent='Mínimo 6 caracteres.';return;}
+  const users = getUsers(); const u = users[email];
+  if(!u){err.textContent='Email no encontrado.';return;}
+  if(u.resetCode!==code){err.textContent='Código incorrecto.';return;}
+  if(Date.now()>u.resetExpiry){err.textContent='Código expirado. Solicitá uno nuevo.';return;}
+  u.pass=hash(pass); delete u.resetCode; delete u.resetExpiry;
+  users[email]=u; saveUsers(users);
+  err.textContent=''; ok.textContent='✓ Contraseña actualizada. Podés iniciar sesión.';
+  setTimeout(()=>switchAuth('login'),1600);
+}
+
+function loginAs(u) {
+  CU = u; ls('pc_session', u.email);
+  document.getElementById('auth-screen').classList.add('hidden');
+  document.getElementById('sb-av').textContent = u.name.charAt(0).toUpperCase();
+  document.getElementById('sb-nm').textContent = u.name;
+  document.getElementById('sb-em').textContent = u.email;
+  refreshAll();
+  loadTicker(); // load real news for ticker if NewsAPI key exists
+}
+
+function doLogout() { CU=null; rmls('pc_session'); document.getElementById('auth-screen').classList.remove('hidden'); switchAuth('login'); }
+function saveCU() { if(!CU)return; const u=getUsers(); u[CU.email]=CU; saveUsers(u); }
+function showUserMenu() { if(confirm('¿Cerrar sesión?')) doLogout(); }
+function tryAutoLogin() { const email=ls('pc_session'); if(!email)return; const u=getUsers(); if(u[email]) loginAs(u[email]); }
+
+// ══════════════════════════════════════════
+// NAV
+// ══════════════════════════════════════════
+const PAGE_T = {'home':'Inicio','dashboard':'Dashboard','my-posts':'Mis Posts','history':'Historial','profiles':'Perfiles','api-settings':'API Keys','posts-flow':'Nuevo Post'};
+function navigate(page, navEl) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+page)?.classList.add('active');
+  if(navEl) navEl.classList.add('active');
+  document.getElementById('tb-title').textContent = PAGE_T[page]||'';
+  if(page==='home')        refreshHome();
+  if(page==='dashboard')   refreshDash();
+  if(page==='my-posts')    renderPosts();
+  if(page==='history')     renderHistory();
+  if(page==='profiles')    renderProfiles();
+  if(page==='api-settings') loadApiPage();
+  if(page==='posts-flow')  initFlow();
+}
+
+// ══════════════════════════════════════════
+// LIVE TICKER — pulls from NewsAPI (reciente) or uses static fallback
+// fix #1: explains source, updates from real API when key is present
+// ══════════════════════════════════════════
+const STATIC_TICKS = [
+  'IA en RRHH: las empresas automatizan screening y onboarding',
+  'Product Management 2026: orquestar sistemas de IA es la nueva competencia clave',
+  'Fintech LATAM: adopción digital supera el 60% en mercados principales',
+  'Los PMs más demandados combinan product sense y comprensión de datos',
+  'Scaleups buscan "AI PM": el perfil más codiciado del mercado tech'
+];
+let tickerItems = [...STATIC_TICKS];
+let tickerIdx = 0;
+
+async function loadTicker() {
+  const key = getKeys().newsapi;
+  const el = document.getElementById('n-ticker');
+  const src = document.getElementById('n-ticker-src');
+  if(!key) {
+    // Static fallback — clearly labeled
+    if(src) src.textContent = '· tendencias editoriales';
+    el.textContent = tickerItems[0];
+    setInterval(()=>{ el.textContent = tickerItems[tickerIdx=(tickerIdx+1)%tickerItems.length]; }, 6000);
+    return;
+  }
+  try {
+    // Fetch from today backwards — last 24h
+    const from = new Date(Date.now()-86400000).toISOString().substring(0,10);
+    const r = await fetch(`https://newsapi.org/v2/everything?q=product+management+OR+inteligencia+artificial+OR+fintech&from=${from}&sortBy=publishedAt&language=es&pageSize=10&apiKey=${key}`);
+    const d = await r.json();
+    if(d.articles?.length) {
+      tickerItems = d.articles.map(a=>a.title).filter(Boolean);
+      if(src) src.textContent = '· NewsAPI · hoy';
+    } else {
+      if(src) src.textContent = '· tendencias editoriales';
+    }
+  } catch(e) {
+    if(src) src.textContent = '· tendencias editoriales';
+  }
+  if(el) el.textContent = tickerItems[0];
+  setInterval(()=>{ const t=document.getElementById('n-ticker'); if(t) t.textContent=tickerItems[tickerIdx=(tickerIdx+1)%tickerItems.length]; }, 6000);
+}
+
+// ══════════════════════════════════════════
+// REFRESH
+// ══════════════════════════════════════════
+function refreshAll() { refreshHome(); refreshSB(); updateTBProf(); }
+
+function refreshSB() {
+  const p = getProv();
+  document.getElementById('sb-api-dot').style.background = p ? 'var(--success)' : 'var(--accent3)';
+  const chosen = getActiveModel();
+  const modeName = p ? p.name : 'Sin modelo';
+  const modeNote = p ? (chosen ? 'seleccionado' : 'automático ✓') : 'configurá una key';
+  document.getElementById('sb-mod-nm').textContent = modeName;
+  document.getElementById('sb-mod-sub').textContent = modeNote;
+  const dc = (CU?.drafts||[]).length;
+  const badge = document.getElementById('sb-db');
+  badge.textContent=dc; badge.style.display=dc>0?'inline':'none';
+}
+
+function updateTBProf() {
+  const pid = ls('pc_active_profile');
+  const pr = getProfs().find(p=>p.id===pid);
+  document.getElementById('tb-prof').textContent = pr ? 'Perfil: '+pr.name : '';
+}
+
+function refreshHome() {
+  if(!CU) return;
+  const h = new Date().getHours();
+  const g = h<12?'Buenos días':h<19?'Buenas tardes':'Buenas noches';
+  document.getElementById('home-greet').textContent = g+' '+CU.name.split(' ')[0]+' 👋';
+  document.getElementById('home-sub').textContent = (CU.generated||0)>0
+    ? `Llevás ${CU.generated} posts generados en total.`
+    : 'Creá tu primer post o configurá tu API key para empezar.';
+  document.getElementById('hm-gen').textContent = CU.generated||0;
+  document.getElementById('hm-dr').textContent = (CU.drafts||[]).length;
+  const pid = ls('pc_active_profile');
+  const pr = getProfs().find(p=>p.id===pid);
+  document.getElementById('hm-prof').textContent = pr ? pr.name : '—';
+  document.getElementById('hm-profs').textContent = pr ? pr.industry||'activo' : 'sin perfil activo';
+  const prov = getProv();
+  document.getElementById('hm-mod').textContent = prov ? prov.name : '—';
+  document.getElementById('hm-mods').textContent = prov ? 'conectado' : 'sin configurar';
+  // activity
+  const act = document.getElementById('home-act');
+  const hist = CU.history||[];
+  if(!hist.length) {
+    act.innerHTML = '<div style="text-align:center;padding:24px;color:var(--text3)"><div style="font-size:12px;margin-bottom:9px">Sin actividad aún.</div><button class="btn btn-primary btn-sm" onclick="navigate(\'posts-flow\',null)">+ Crear post</button></div>';
+  } else {
+    act.innerHTML = hist.slice(-5).reverse().map(p=>`
+      <div style="display:flex;align-items:flex-start;gap:7px;padding:8px 0;border-bottom:1px solid var(--border)">
+        <div style="width:6px;height:6px;border-radius:50%;background:var(--amber);flex-shrink:0;margin-top:4px"></div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:11px;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.hook}</div>
+          <div style="font-size:10px;color:var(--text3);margin-top:2px">${p.time} · ${p.style}</div>
+        </div>
+      </div>`).join('');
+  }
+  // week chart
+  const wc = Math.min(CU.generated||0, 5);
+  document.getElementById('wk-prog').textContent = wc+'/5';
+  document.getElementById('wk-bar').style.width = (wc/5*100)+'%';
+  buildWeekChart();
+  refreshSB();
+}
+
+function buildWeekChart() {
+  // Build chart from history dates
+  const hist = CU?.history || [];
+  const days = ['L','M','X','J','V','S','D'];
+  const today = new Date().getDay(); // 0=Sun
+  const counts = new Array(7).fill(0);
+  const now_ = Date.now();
+  hist.forEach(p => {
+    const d = new Date(p.ts||now_);
+    const diff = Math.floor((now_ - d.getTime()) / 86400000);
+    if(diff < 7) { const idx = (d.getDay()+6)%7; counts[idx]++; }
+  });
+  const max = Math.max(...counts, 1);
+  const chart = document.getElementById('week-chart');
+  if(!chart) return;
+  chart.innerHTML = days.map((d,i)=>`
+    <div style="display:flex;flex-direction:column;align-items:center;flex:1">
+      <div style="flex:1;width:100%;display:flex;align-items:flex-end">
+        <div style="width:100%;height:${Math.max(counts[i]/max*100,4)}%;border-radius:3px 3px 0 0;background:${i===(new Date().getDay()+6)%7?'var(--accent)':'rgba(108,99,255,.25)'}"></div>
+      </div>
+      <div style="font-size:9px;color:var(--text3);margin-top:3px">${d}</div>
+    </div>`).join('');
+}
+
+function refreshDash() {
+  if(!CU) return;
+  const hist = CU.history||[];
+  document.getElementById('d-gen').textContent = CU.generated||0;
+  document.getElementById('d-hist').textContent = hist.length;
+  document.getElementById('d-dr').textContent = (CU.drafts||[]).length;
+  document.getElementById('d-pr').textContent = getProfs().length;
+  const re = document.getElementById('d-recent');
+  if(!hist.length) {
+    re.innerHTML = '<div style="text-align:center;padding:24px;color:var(--text3);font-size:11px">Sin posts aún.</div>';
+  } else {
+    re.innerHTML = hist.slice(-5).reverse().map((p,i)=>`
+      <div style="display:flex;align-items:center;gap:7px;padding:7px 0;border-bottom:1px solid var(--border)">
+        <div style="font-size:10px;color:var(--text3);width:18px">0${i+1}</div>
+        <div style="flex:1;font-size:11px;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.hook}</div>
+        <div style="font-size:10px;color:var(--text3)">${p.style}</div>
+      </div>`).join('');
+  }
+  const counts = {};
+  hist.forEach(p=>{counts[p.style]=(counts[p.style]||0)+1;});
+  const colors = {Storytelling:'var(--amber)','Value Bomb':'var(--accent)',Opinión:'var(--accent3)',Informativo:'var(--accent2)'};
+  document.getElementById('d-styles').innerHTML = Object.keys(counts).length
+    ? Object.entries(counts).map(([s,n])=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:11px"><span style="color:${colors[s]||'var(--text)'}">${s}</span><span style="font-weight:600">${n}</span></div>`).join('')
+    : '<div style="text-align:center;padding:18px;color:var(--text3);font-size:11px">Sin datos aún.</div>';
+}
+
+// ══════════════════════════════════════════
+// MY POSTS
+// ══════════════════════════════════════════
+function renderPosts() {
+  if(!CU) return;
+  const dr = CU.drafts||[]; const pub = CU.published||[];
+  document.getElementById('tc-d').textContent = dr.length;
+  document.getElementById('tc-p').textContent = pub.length;
+  const dg = document.getElementById('dg'); const de = document.getElementById('d-empty');
+  if(!dr.length){dg.innerHTML='';de.style.display='block';}
+  else {
+    de.style.display='none';
+    dg.innerHTML = dr.map((d,i)=>`
+      <div class="pcard">
+        <div class="pcst st-draft">● Borrador</div>
+        <div class="pctxt">${d.body.substring(0,300)}</div>
+        <div class="pcmeta"><span>${d.time}</span><span class="pcsty">${d.style}</span></div>
+        <div style="display:flex;gap:4px;margin-top:8px;flex-wrap:wrap">
+          <button class="btn btn-ghost btn-sm" onclick="openDraftEd(${i})">Editar</button>
+          <button class="btn btn-success btn-sm" onclick="pubDraft(${i})">Publicar</button>
+          <button class="btn btn-danger btn-sm" onclick="delDraft(${i})">Eliminar</button>
+        </div>
+      </div>`).join('');
+  }
+  const pg = document.getElementById('pub-g'); const pe = document.getElementById('pub-empty');
+  if(!pub.length){pg.innerHTML='';pe.style.display='block';}
+  else {
+    pe.style.display='none';
+    pg.innerHTML = pub.map((p,i)=>`
+      <div class="pcard">
+        <div class="pcst st-pub">✓ Publicado</div>
+        <div class="pctxt">${p.body.substring(0,300)}</div>
+        <div class="pcmeta"><span>${p.time}</span><span class="pcsty">${p.style}</span></div>
+      </div>`).join('');
+  }
+}
+
+function switchPTab(tab,type) {
+  document.querySelectorAll('.ptab').forEach(t=>t.classList.remove('active')); tab.classList.add('active');
+  document.getElementById('tab-drafts').style.display = type==='drafts'?'block':'none';
+  document.getElementById('tab-published').style.display = type==='published'?'block':'none';
+}
+
+function openDraftEd(i) {
+  // navigate to flow and pre-fill editor
+  navigate('posts-flow', null);
+  setTimeout(()=>{
+    goStep(4, true);
+    document.getElementById('gen-load').classList.remove('vis');
+    document.getElementById('gen-res').style.display='block';
+    document.getElementById('gen-grid').innerHTML='<div style="color:var(--text3);font-size:12px;padding:14px;grid-column:span 3">Editando borrador guardado.</div>';
+    document.getElementById('post-ed-area').style.display='block';
+    document.getElementById('post-ed').value = CU.drafts[i].body;
+    updCharCt();
+    window._editingDraftIdx = i;
+  }, 80);
+}
+
+function delDraft(i) {
+  if(!confirm('¿Eliminar este borrador?'))return;
+  CU.drafts.splice(i,1); saveCU(); renderPosts(); refreshAll(); toast('Borrador eliminado');
+}
+
+function pubDraft(i) {
+  CU.published = CU.published||[];
+  CU.published.push(CU.drafts[i]);
+  CU.drafts.splice(i,1);
+  saveCU(); renderPosts(); refreshAll(); toast('✓ Marcado como publicado');
+}
+
+// ══════════════════════════════════════════
+// HISTORY — fix #6
+// ══════════════════════════════════════════
+let _histFilter = 'all';
+let _histOpenIdx = -1;
+
+function renderHistory() {
+  if(!CU) return;
+  const hist = CU.history||[];
+  const search = (document.getElementById('hist-search')?.value||'').toLowerCase();
+  let items = hist.slice().reverse();
+  if(_histFilter!=='all') items = items.filter(p=>p.style===_histFilter);
+  if(search) items = items.filter(p=>p.body.toLowerCase().includes(search)||p.hook.toLowerCase().includes(search));
+
+  const el = document.getElementById('hist-list');
+  const empty = document.getElementById('hist-empty');
+  if(!items.length){el.innerHTML='';empty.style.display='block';return;}
+  empty.style.display='none';
+  const colors = {Storytelling:'var(--amber)','Value Bomb':'var(--accent)',Opinión:'var(--accent3)',Informativo:'var(--accent2)'};
+  el.innerHTML = items.map((p,i)=>`
+    <div class="hist-item" onclick="openHistModal(${hist.length-1-i})">
+      <div class="hist-dot" style="background:${colors[p.style]||'var(--text3)'}"></div>
+      <div style="flex:1;min-width:0">
+        <div class="hist-body">${p.body.substring(0,220)}${p.body.length>220?'...':''}</div>
+        <div class="hist-meta">${p.time} · ${p.style} · ${p.provider||'IA'}</div>
+        <div class="hist-actions">
+          <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();openHistModal(${hist.length-1-i})">Ver completo</button>
+          <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();saveHistDraftById(${hist.length-1-i})">💾 Borrador</button>
+          <button class="btn btn-primary btn-sm" onclick="event.stopPropagation();copyHistById(${hist.length-1-i})">⎘ Copiar</button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function filterHist(style, el) {
+  if(style!==null) {
+    _histFilter = style;
+    document.querySelectorAll('.nfpill').forEach(p=>p.classList.remove('active'));
+    if(el) el.classList.add('active');
+  }
+  renderHistory();
+}
+
+function clearHistory() {
+  if(!confirm('¿Limpiar todo el historial? Esta acción no se puede deshacer.'))return;
+  CU.history=[]; saveCU(); renderHistory(); refreshAll(); toast('Historial limpiado');
+}
+
+function openHistModal(idx) {
+  _histOpenIdx = idx;
+  const p = (CU.history||[])[idx]; if(!p) return;
+  document.getElementById('hm-title').textContent = p.style;
+  document.getElementById('hm-meta').textContent = p.time + ' · ' + (p.provider||'IA');
+  document.getElementById('hm-body').value = p.body;
+  document.getElementById('hist-modal').classList.add('open');
+}
+function closeHistModal() { document.getElementById('hist-modal').classList.remove('open'); }
+function copyHistPost() { const b=document.getElementById('hm-body').value; navigator.clipboard.writeText(b).then(()=>toast('Copiado ✓')).catch(()=>{}); }
+function saveHistAsDraft() {
+  const b = document.getElementById('hm-body').value.trim();
+  const p = (CU.history||[])[_histOpenIdx]||{};
+  CU.drafts=CU.drafts||[];
+  CU.drafts.push({body:b,style:p.style||'Manual',hook:b.substring(0,80),time:nowStr()});
+  saveCU(); renderPosts(); refreshAll(); closeHistModal(); toast('Borrador guardado ✓');
+}
+function deleteHistPost() {
+  if(!confirm('¿Eliminar este post del historial?'))return;
+  (CU.history||[]).splice(_histOpenIdx,1);
+  saveCU(); closeHistModal(); renderHistory(); refreshAll(); toast('Eliminado del historial');
+}
+function saveHistDraftById(idx) {
+  const p = (CU.history||[])[idx]; if(!p)return;
+  CU.drafts=CU.drafts||[];
+  CU.drafts.push({body:p.body,style:p.style,hook:p.hook,time:nowStr()});
+  saveCU(); refreshAll(); toast('Borrador guardado ✓');
+}
+function copyHistById(idx) {
+  const p = (CU.history||[])[idx]; if(!p)return;
+  navigator.clipboard.writeText(p.body).then(()=>toast('Copiado ✓')).catch(()=>{});
+}
+
+// ══════════════════════════════════════════
+// PROFILES
+// ══════════════════════════════════════════
+const getProfs = () => lsJ('pc_profs_'+(CU?.email||'')) || [];
+const saveProfs = p => lsJ('pc_profs_'+(CU?.email||''), p);
+const EMOJIS = ['👤','💼','🎯','🚀','💡','⚡'];
+const COLORS  = ['rgba(108,99,255,.15)','rgba(78,205,196,.15)','rgba(247,183,49,.15)','rgba(255,107,107,.15)'];
+
+function renderProfiles() {
+  const profs = getProfs();
+  const grid = document.getElementById('profiles-grid');
+  const empty = document.getElementById('profiles-empty');
+  const aid = ls('pc_active_profile');
+  if(!profs.length){grid.innerHTML='';empty.style.display='block';return;}
+  empty.style.display='none';
+  grid.innerHTML = profs.map((p,idx)=>`
+    <div class="profcard ${p.id===aid?'pa':''}" onclick="setActivProf('${p.id}')">
+      ${p.id===aid?'<div class="pabadge">Activo</div>':''}
+      <div class="profav" style="background:${COLORS[idx%4]}">${EMOJIS[idx%6]}</div>
+      <div class="profnm">${p.name}</div>
+      <div class="profind">${p.role||''} ${p.industry?'· '+p.industry:''}</div>
+      <div class="proftags">${(p.tones||[]).map(t=>'<span class="proftag">'+t+'</span>').join('')}</div>
+      <div style="display:flex;gap:5px;margin-top:9px">
+        <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();openProfModal('${p.id}')">Editar</button>
+        ${p.id===aid?'<span style="font-size:10px;color:var(--success);display:flex;align-items:center;margin-left:auto">✓ En uso</span>':'<button class="btn btn-primary btn-sm" style="margin-left:auto" onclick="event.stopPropagation();setActivProf(\''+p.id+'\')">Usar</button>'}
+      </div>
+    </div>`).join('') +
+    (profs.length<3 ? '<div class="addpcard" onclick="openProfModal()"><div style="font-size:24px">+</div><div style="font-size:12px;font-weight:500">Nuevo perfil</div></div>' : '');
+}
+
+function setActivProf(id) { ls('pc_active_profile',id); renderProfiles(); updateTBProf(); refreshHome(); toast('Perfil activado'); }
+
+function openProfModal(id) {
+  document.getElementById('prof-modal').classList.add('open');
+  document.getElementById('pm-err').textContent='';
+  document.querySelectorAll('.tonechip').forEach(c=>c.classList.remove('sel'));
+
+  // Always reset all fields first
+  ['pm-name','pm-ind','pm-role','pm-region','pm-voice','pm-aud','pm-topics','pm-examples','pm-avoid'].forEach(k=>{
+    const el = document.getElementById(k); if(el) el.value='';
+  });
+  const personalRadio = document.getElementById('pm-type-personal');
+  if(personalRadio) personalRadio.checked = true;
+
+  if(id) {
+    const p = getProfs().find(x=>x.id===id); if(!p)return;
+    document.getElementById('pm-ttl').textContent = 'Editar perfil';
+    document.getElementById('pm-id').value    = p.id;
+    document.getElementById('pm-name').value  = p.name||'';
+    document.getElementById('pm-ind').value   = p.industry||'';
+    document.getElementById('pm-role').value  = p.role||'';
+    document.getElementById('pm-region').value= p.region||'';
+    document.getElementById('pm-voice').value = p.voice||'';
+    document.getElementById('pm-aud').value   = p.audience||'';
+    document.getElementById('pm-topics').value   = p.topics||'';
+    document.getElementById('pm-examples').value = p.examples||'';
+    document.getElementById('pm-avoid').value    = p.avoid||'';
+    const typeRadio = document.getElementById('pm-type-'+(p.profileType||'personal'));
+    if(typeRadio) typeRadio.checked = true;
+    (p.tones||[]).forEach(t=>{
+      document.querySelectorAll('.tonechip').forEach(c=>{ if(c.textContent===t) c.classList.add('sel'); });
+    });
+    document.getElementById('pm-del').style.display='inline-flex';
+  } else {
+    document.getElementById('pm-ttl').textContent='Nuevo perfil';
+    document.getElementById('pm-id').value='';
+    document.getElementById('pm-del').style.display='none';
+  }
+}
+function closeProfModal() { document.getElementById('prof-modal').classList.remove('open'); }
+function saveProfile() {
+  const name = document.getElementById('pm-name').value.trim();
+  if(!name){document.getElementById('pm-err').textContent='El nombre es obligatorio.';return;}
+  const profs = getProfs(); const eid = document.getElementById('pm-id').value;
+  const tones = [...document.querySelectorAll('.tonechip.sel')].map(c=>c.textContent);
+  const profileType = document.querySelector('input[name="pm-type"]:checked')?.value || 'personal';
+  const data = {
+    name,
+    profileType,
+    industry: document.getElementById('pm-ind').value.trim(),
+    role:     document.getElementById('pm-role').value.trim(),
+    region:   document.getElementById('pm-region').value.trim(),
+    voice:    document.getElementById('pm-voice').value.trim(),
+    audience: document.getElementById('pm-aud').value.trim(),
+    topics:   document.getElementById('pm-topics').value.trim(),
+    examples: document.getElementById('pm-examples').value.trim(),
+    avoid:    document.getElementById('pm-avoid').value.trim(),
+    tones
+  };
+  if(eid) { const idx=profs.findIndex(p=>p.id===eid); if(idx>-1) profs[idx]={...profs[idx],...data}; }
+  else { const id='pr_'+Date.now(); profs.push({id,...data}); if(profs.length===1) ls('pc_active_profile',id); }
+  saveProfs(profs); closeProfModal(); renderProfiles(); updateTBProf(); refreshHome(); toast('Perfil guardado ✓');
+}
+function deleteProfile() {
+  const id = document.getElementById('pm-id').value;
+  if(!confirm('¿Eliminar este perfil?'))return;
+  saveProfs(getProfs().filter(p=>p.id!==id));
+  if(ls('pc_active_profile')===id) rmls('pc_active_profile');
+  closeProfModal(); renderProfiles(); refreshAll(); toast('Perfil eliminado');
+}
+
+// ══════════════════════════════════════════
+// API SETTINGS — toggles, selector, diagnostics
+// ══════════════════════════════════════════
+const API_META = {
+  claude: { name:'Claude Sonnet 4',   label:'Anthropic', color:'var(--amber)',   hint:'console.anthropic.com · sk-ant-',    url:'https://console.anthropic.com/settings/keys', ph:'sk-ant-api03-...' },
+  gpt4:   { name:'GPT-4o',            label:'OpenAI',    color:'var(--amber)',   hint:'platform.openai.com · sk-',          url:'https://platform.openai.com/api-keys',          ph:'sk-...' },
+  groq:   { name:'Groq Llama 3.3',    label:'Free',      color:'var(--success)', hint:'console.groq.com · gsk_ · límite diario', url:'https://console.groq.com/keys',            ph:'gsk_...' },
+  gemini: { name:'Gemini 2.0 Flash',  label:'Free',      color:'var(--success)', hint:'aistudio.google.com · AIza · 180M tokens/mes', url:'https://aistudio.google.com/apikey',  ph:'AIza...' },
+};
+
+const isEnabled  = id => ls('pc_en_'+id) !== '0';          // default ON
+const setEnabled = (id, val) => ls('pc_en_'+id, val?'1':'0');
+const getActiveModel = () => ls('pc_active_model') || '';   // '' = auto
+const setActiveModel = id => ls('pc_active_model', id);
+
+// Returns the provider to use: respects toggle + explicit selection
+const getProv = () => {
+  const k = getKeys();
+  const chosen = getActiveModel();
+  // If user picked a specific model and it's valid, use it
+  if(chosen && k[chosen] && isEnabled(chosen)) return {id:chosen, key:k[chosen], ...PROV[chosen]};
+  // Otherwise auto: first enabled model with key
+  for(const id of ['claude','gpt4','groq','gemini']) {
+    if(k[id] && isEnabled(id)) return {id, key:k[id], ...PROV[id]};
+  }
+  return null;
+};
+
+function loadApiPage() {
+  const k = getKeys();
+  const providerList = document.getElementById('api-providers-list');
+  const modelSelector = document.getElementById('model-selector');
+  if(!providerList || !modelSelector) return;
+
+  // Build provider cards
+  providerList.innerHTML = Object.entries(API_META).map(([id, m]) => {
+    const hasKey  = !!k[id];
+    const enabled = isEnabled(id);
+    const statusColor = hasKey && enabled ? 'var(--success)' : hasKey ? 'var(--amber)' : 'var(--text3)';
+    const statusText  = hasKey && enabled ? 'Activo' : hasKey ? 'Desactivado' : 'Sin key';
+    return `
+    <div id="apicard-${id}" style="border:1px solid var(--border);border-radius:var(--r);padding:13px;background:${hasKey&&enabled?'var(--surface)':'var(--bg3)'}">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+        <div style="width:8px;height:8px;border-radius:50%;background:${statusColor};flex-shrink:0"></div>
+        <a href="${m.url}" target="_blank" style="font-size:12px;font-weight:700;color:var(--text);text-decoration:none;flex:1">${m.name} ↗</a>
+        <span style="font-size:9px;padding:1px 6px;border-radius:3px;font-weight:600;background:rgba(255,255,255,.06);color:${m.color}">${m.label}</span>
+        <span style="font-size:10px;color:${statusColor};font-weight:500">${statusText}</span>
+        <!-- Toggle switch -->
+        <label style="position:relative;display:inline-flex;align-items:center;cursor:pointer;flex-shrink:0" title="${enabled?'Desactivar':'Activar'} este modelo">
+          <input type="checkbox" id="tog-${id}" ${enabled?'checked':''} onchange="toggleProvider('${id}',this.checked)"
+            style="opacity:0;width:0;height:0;position:absolute">
+          <div id="tog-track-${id}" style="width:32px;height:17px;border-radius:9px;background:${enabled?'var(--accent)':'var(--bg4)'};border:1px solid var(--border2);transition:background .2s;position:relative">
+            <div style="position:absolute;top:2px;left:${enabled?'15':'2'}px;width:11px;height:11px;border-radius:50%;background:#fff;transition:left .2s" id="tog-thumb-${id}"></div>
+          </div>
+        </label>
+      </div>
+      <div style="font-size:10px;color:var(--text3);margin-bottom:7px">${m.hint}</div>
+      <input class="finp" id="key-${id}" type="password" placeholder="${m.ph}" autocomplete="off"
+        value="${k[id]||''}" oninput="onKeyInput('${id}',this.value)" style="font-size:11px">
+    </div>`;
+  }).join('') + `
+    <!-- NewsAPI separate -->
+    <div style="border:1px solid var(--border);border-radius:var(--r);padding:13px;background:var(--bg3)">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+        <div style="width:8px;height:8px;border-radius:50%;background:${k.newsapi?'var(--accent)':'var(--text3)'};flex-shrink:0" id="dot-newsapi"></div>
+        <a href="https://newsapi.org/register" target="_blank" style="font-size:12px;font-weight:700;color:var(--text);text-decoration:none;flex:1">NewsAPI ↗</a>
+        <span style="font-size:9px;padding:1px 6px;border-radius:3px;font-weight:600;background:rgba(108,99,255,.15);color:var(--accent)">Noticias · opcional</span>
+      </div>
+      <div style="font-size:10px;color:var(--text3);margin-bottom:7px">newsapi.org · gratis hasta 100 req/día · para el buscador de noticias del paso 2</div>
+      <input class="finp" id="key-newsapi" type="password" placeholder="Tu NewsAPI key..." autocomplete="off"
+        value="${k.newsapi||''}" oninput="document.getElementById('dot-newsapi').style.background=this.value?'var(--accent)':'var(--text3)'" style="font-size:11px">
+    </div>`;
+
+  // Build active model selector pills
+  refreshModelSelector();
+}
+
+function refreshModelSelector() {
+  const k = getKeys();
+  const chosen = getActiveModel();
+  const sel = document.getElementById('model-selector');
+  if(!sel) return;
+  const pills = Object.entries(API_META).map(([id, m]) => {
+    const available = !!k[id] && isEnabled(id);
+    const isActive  = chosen === id || (!chosen && id === Object.keys(API_META).find(x=>k[x]&&isEnabled(x)));
+    return `
+      <button onclick="selectModel('${id}')"
+        style="padding:6px 13px;border-radius:20px;font-size:11px;font-weight:500;cursor:${available?'pointer':'not-allowed'};
+               border:1px solid ${isActive&&available?'var(--accent)':available?'var(--border2)':'var(--border)'};
+               background:${isActive&&available?'rgba(108,99,255,.15)':available?'var(--surface)':'var(--bg4)'};
+               color:${isActive&&available?'var(--accent)':available?'var(--text2)':'var(--text3)'};
+               opacity:${available?1:0.4}"
+        ${!available?'disabled':''}>
+        ${m.name}${isActive&&available?' ✓':''}
+        ${!available?'<span style="font-size:9px;display:block;margin-top:1px">'+(k[id]?'desactivado':'sin key')+'</span>':''}
+      </button>`;
+  });
+  // Auto pill
+  const autoActive = !chosen;
+  pills.unshift(`
+    <button onclick="selectModel('')"
+      style="padding:6px 13px;border-radius:20px;font-size:11px;font-weight:500;cursor:pointer;
+             border:1px solid ${autoActive?'var(--accent2)':'var(--border2)'};
+             background:${autoActive?'rgba(78,205,196,.12)':'var(--surface)'};
+             color:${autoActive?'var(--accent2)':'var(--text2)'}">
+      Automático${autoActive?' ✓':''}
+    </button>`);
+  sel.innerHTML = pills.join('');
+}
+
+function selectModel(id) {
+  setActiveModel(id);
+  refreshModelSelector();
+  refreshSB();
+  const name = id ? (API_META[id]?.name||id) : 'automático';
+  toast(`Modelo activo: ${name}`);
+}
+
+function toggleProvider(id, enabled) {
+  setEnabled(id, enabled);
+  // Update toggle visual
+  const track = document.getElementById('tog-track-'+id);
+  const thumb = document.getElementById('tog-thumb-'+id);
+  const card  = document.getElementById('apicard-'+id);
+  if(track) track.style.background = enabled ? 'var(--accent)' : 'var(--bg4)';
+  if(thumb) thumb.style.left = enabled ? '15px' : '2px';
+  if(card)  card.style.background = enabled && getKeys()[id] ? 'var(--surface)' : 'var(--bg3)';
+  // If the currently selected model was just disabled, reset to auto
+  if(!enabled && getActiveModel()===id) { setActiveModel(''); toast(`${API_META[id].name} desactivado — cambiado a automático`); }
+  refreshModelSelector();
+  refreshSB();
+}
+
+function onKeyInput(id, val) {
+  const card  = document.getElementById('apicard-'+id);
+  const dot   = card?.querySelector('div[style*="border-radius:50%"]');
+  const stat  = card?.querySelector('span[style*="font-weight:500"]');
+  const hasKey = val.trim().length > 0;
+  const enabled = isEnabled(id);
+  const color = hasKey && enabled ? 'var(--success)' : hasKey ? 'var(--amber)' : 'var(--text3)';
+  if(dot) dot.style.background = color;
+  if(stat) { stat.textContent = hasKey&&enabled?'Activo':hasKey?'Desactivado':'Sin key'; stat.style.color=color; }
+}
+
+function saveAllKeys() {
+  ['claude','gpt4','groq','gemini','newsapi'].forEach(id=>{
+    const v = (document.getElementById('key-'+id)?.value||'').trim();
+    if(v) ls('pc_key_'+id, v); else rmls('pc_key_'+id);
+  });
+  refreshAll();
+  loadApiPage(); // re-render to reflect saved state
+  toast('Claves guardadas ✓');
+}
+
+// ── Test active model ──────────────────────────────────────────────────────
+async function testActiveModel() {
+  const prov = getProv();
+  const res = document.getElementById('api-test-result');
+  if(!res) return;
+  if(!prov) {
+    res.style.display='block';
+    res.style.background='rgba(255,107,107,.08)';
+    res.style.border='1px solid rgba(255,107,107,.25)';
+    res.innerHTML='<strong style="color:var(--accent3)">Sin modelo activo.</strong> Configurá una API key y activá al menos un modelo.';
+    return;
+  }
+  res.style.display='block';
+  res.style.background='var(--bg3)';
+  res.style.border='1px solid var(--border)';
+  res.innerHTML=`<span style="color:var(--text3)">Probando <strong style="color:var(--text2)">${prov.name}</strong>...</span>`;
+  const t0 = Date.now();
+  try {
+    const reply = await prov.call('Respondé solo con la palabra: OK', prov.key);
+    const ms = Date.now()-t0;
+    res.style.background='rgba(78,205,196,.06)';
+    res.style.border='1px solid rgba(78,205,196,.2)';
+    res.innerHTML=`<strong style="color:var(--success)">✓ ${prov.name} funciona correctamente</strong><br>
+      <span style="color:var(--text3)">Respuesta: "${reply.trim().substring(0,60)}" · Tiempo: ${ms}ms</span>`;
+  } catch(err) {
+    res.style.background='rgba(255,107,107,.06)';
+    res.style.border='1px solid rgba(255,107,107,.2)';
+    res.innerHTML=`<strong style="color:var(--accent3)">✗ Error con ${prov.name}</strong><br>
+      <span style="color:var(--text3);word-break:break-all">${err.message||'Sin respuesta'}</span><br>
+      <span style="color:var(--text3);font-size:10px;margin-top:4px;display:block">
+        Posibles causas: key incorrecta · cuota agotada · modelo no disponible en tu región
+      </span>`;
+  }
+}
+
+// ══════════════════════════════════════════
+// FLOW
+// ══════════════════════════════════════════
+let selSrc_='mytopic', selStyle_='storytelling', selLen_='medium', selNews_=[], newsPeriod_='day';
+
+// ── Document upload for profile modal ─────────────────────────────────────
+async function handleDocUpload(event) {
+  const file = event.target.files[0];
+  if(!file) return;
+  const status = document.getElementById('pm-doc-status');
+  const ta = document.getElementById('pm-examples');
+  status.textContent = 'Leyendo archivo...';
+  status.style.color = 'var(--accent2)';
+
+  try {
+    if(file.name.endsWith('.pdf')) {
+      // PDF: read as ArrayBuffer and extract text using basic approach
+      const arrayBuffer = await file.arrayBuffer();
+      const bytes = new Uint8Array(arrayBuffer);
+      // Extract readable ASCII text from PDF bytes (simple extraction for text-based PDFs)
+      let text = '';
+      for(let i=0; i<bytes.length; i++) {
+        const c = bytes[i];
+        if(c >= 32 && c < 127) text += String.fromCharCode(c);
+        else if(c === 10 || c === 13) text += '\n';
+      }
+      // Clean up PDF artifacts
+      text = text.replace(/[^\x20-\x7E\n]/g,'')
+                 .replace(/(\w)\s{2,}(\w)/g,'$1 $2')
+                 .replace(/\n{3,}/g,'\n\n')
+                 .replace(/<[^>]*>/g,'')
+                 .trim();
+      // Filter out PDF metadata junk (lines shorter than 20 chars that look like codes)
+      const lines = text.split('\n').filter(l => l.trim().length > 15 || l.trim() === '');
+      text = lines.join('\n').trim();
+      if(text.length > 50) {
+        ta.value = (ta.value ? ta.value + '\n\n---\n\n' : '') + text.substring(0, 4000);
+        status.textContent = `✓ PDF procesado (${text.length} caracteres extraídos)`;
+        status.style.color = 'var(--success)';
+      } else {
+        status.textContent = 'PDF con texto no extraíble. Pegá el contenido manualmente.';
+        status.style.color = 'var(--amber)';
+      }
+    } else {
+      // TXT, DOCX (as text), and other text files
+      const text = await file.text();
+      // For DOCX, strip XML tags
+      const clean = text.replace(/<[^>]*>/g,' ').replace(/\s{3,}/g,' ').trim();
+      ta.value = (ta.value ? ta.value + '\n\n---\n\n' : '') + clean.substring(0, 4000);
+      status.textContent = `✓ Archivo cargado (${clean.length} caracteres)`;
+      status.style.color = 'var(--success)';
+    }
+  } catch(e) {
+    status.textContent = 'Error al leer el archivo. Pegá el contenido manualmente.';
+    status.style.color = 'var(--accent3)';
+  }
+  // Reset input so same file can be re-uploaded
+  event.target.value = '';
+}
+
+function initFlow() {
+  goStep(1, true);
+  selSrc_='mytopic'; selStyle_='storytelling'; selLen_='medium'; selNews_=[];
+  document.getElementById('news-res-list').innerHTML='';
+  document.getElementById('news-sel-banner').style.display='none';
+  window._editingDraftIdx=-1;
+  // Populate profile selector
+  const profs = getProfs();
+  const aid   = ls('pc_active_profile');
+  const sel   = document.getElementById('fl-prof-sel');
+  if(!profs.length) {
+    sel.innerHTML = '<option value="">⚠ Sin perfiles — creá uno en "Perfiles"</option>';
+  } else {
+    sel.innerHTML = '<option value="">Sin perfil (modo genérico)</option>' +
+      profs.map(p => `<option value="${p.id}" ${p.id===aid?'selected':''}>${p.name}${p.profileType==='company'?' 🏢':p.profileType==='thought'?' 💡':' 👤'}</option>`).join('');
+  }
+}
+
+function selSrc(s) {
+  selSrc_=s;
+  document.querySelectorAll('.srcc').forEach(c=>c.classList.remove('sel'));
+  document.getElementById('src-'+s).classList.add('sel');
+  ['mytopic','linkedin','youtube'].forEach(x=>document.getElementById('si-'+x).style.display=x===s?'block':'none');
+}
+
+function selStyle(s) {
+  selStyle_=s;
+  document.querySelectorAll('.stypill[id^="sty-"]').forEach(p=>p.classList.remove('sel'));
+  document.getElementById('sty-'+s).classList.add('sel');
+}
+
+function selLen(l) {
+  selLen_=l;
+  document.querySelectorAll('.stypill[id^="len-"]').forEach(p=>p.classList.remove('sel'));
+  document.getElementById('len-'+l).classList.add('sel');
+}
+
+function setNewsPeriod(p, el) {
+  newsPeriod_=p;
+  document.querySelectorAll('#fs-2 .nfpill').forEach(x=>x.classList.remove('active'));
+  if(el) el.classList.add('active');
+}
+
+function goStep(n, init) {
+  if(!init) {
+    const prov=getProv();
+    if(!prov&&n>1){alert('Configurá al menos una API key en "API Keys".');navigate('api-settings',null);return;}
+    if(n===2) {
+      const t=document.getElementById('topic-in').value.trim();
+      if(!t&&selSrc_==='mytopic'){document.getElementById('topic-in').style.borderColor='var(--accent3)';document.getElementById('topic-in').focus();return;}
+      document.getElementById('topic-in').style.borderColor='';
+      // pre-fill news query with topic keywords
+      const topic=document.getElementById('topic-in').value.trim();
+      document.getElementById('news-q').value=topic.split(' ').slice(0,6).join(' ');
+    }
+    if(n===3) buildQs();   // fix #3: topic-contextual questions
+    if(n===4) runGen();    // fix #4: robust generation
+  }
+  [1,2,3,4].forEach(i=>{
+    document.getElementById('fs-'+i).style.display=i===n?'block':'none';
+    const fi=document.getElementById('fi-'+i); const fn=document.getElementById('fn-'+i);
+    fi.className='fstep';
+    if(i<n){fi.classList.add('done');fn.textContent='✓';}
+    else if(i===n){fi.classList.add('active');fn.textContent=i;}
+    else{fn.textContent=i;}
+    if(i<4) document.getElementById('fc-'+i).className='sconn'+(i<n?' done':'');
+  });
+  if(n===4){document.getElementById('gen-load').classList.add('vis');document.getElementById('gen-res').style.display='none';}
+}
+
+// ══════════════════════════════════════════
+// NEWS — fix #2: date filtering, recent results
+// ══════════════════════════════════════════
+async function searchNews() {
+  const q = document.getElementById('news-q').value.trim(); if(!q)return;
+  const useNA = document.getElementById('use-newsapi').checked;
+  const useRSS = document.getElementById('use-rss').checked;
+  const naKey = getKeys().newsapi;
+
+  document.getElementById('news-loading').style.display='block';
+  document.getElementById('news-res-list').innerHTML='';
+  selNews_=[]; updNewsBanner();
+
+  // Calculate date range
+  const now_ = new Date();
+  const fromDate = new Date(now_);
+  if(newsPeriod_==='day') fromDate.setDate(fromDate.getDate()-1);
+  else if(newsPeriod_==='week') fromDate.setDate(fromDate.getDate()-7);
+  else fromDate.setMonth(fromDate.getMonth()-1);
+  const fromStr = fromDate.toISOString().substring(0,10);
+  const toStr   = now_.toISOString().substring(0,10);
+
+  let res = [];
+
+  // NewsAPI with date filter
+  if(useNA && naKey) {
+    try {
+      const url = `https://newsapi.org/v2/everything?q=${encodeURIComponent(q)}&from=${fromStr}&to=${toStr}&sortBy=publishedAt&language=es&pageSize=6&apiKey=${naKey}`;
+      const r = await fetch(url);
+      const d = await r.json();
+      if(d.articles?.length) {
+        res = res.concat(d.articles.map(a=>({
+          title:a.title, description:a.description||'', url:a.url,
+          source:a.source?.name||'NewsAPI',
+          date:a.publishedAt?.substring(0,10)||''
+        })));
+      } else if(d.message) {
+        console.warn('NewsAPI:', d.message);
+      }
+    } catch(e){ console.warn('NewsAPI error:', e); }
+  }
+
+  // Google News RSS — always recent
+  if(useRSS) {
+    try {
+      const rssUrl = `https://news.google.com/rss/search?q=${encodeURIComponent(q)}&hl=es&gl=AR&ceid=AR:es`;
+      const proxy  = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}&count=6`;
+      const r = await fetch(proxy);
+      const d = await r.json();
+      if(d.items?.length) {
+        res = res.concat(d.items.map(i=>({
+          title: i.title.replace(/<[^>]*>/g,''),
+          description: (i.description||'').replace(/<[^>]*>/g,'').substring(0,200),
+          url: i.link, source:'Google News',
+          date: (i.pubDate||'').substring(0,10)
+        })));
+      }
+    } catch(e){ console.warn('RSS error:', e); }
+  }
+
+  // Sort all results by date desc
+  res.sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+
+  // AI fallback if nothing found
+  if(!res.length) {
+    const prov = getProv();
+    if(prov) {
+      try {
+        const raw = await prov.call(
+          `Generá 5 noticias o tendencias MUY RECIENTES (últimos 7 días) sobre: "${q}". Respondé SOLO con JSON:\n{"news":[{"title":"título","description":"descripción de 1-2 oraciones","source":"tipo de fuente","date":"${toStr}"}]}`,
+          prov.key
+        );
+        const m = raw.replace(/```json|```/g,'').trim().match(/\{[\s\S]*\}/);
+        const p = JSON.parse(m?m[0]:'{}');
+        if(p.news) res = p.news.map(n=>({...n,url:null}));
+      } catch(e){ console.warn('AI news fallback:', e); }
+    }
+  }
+
+  document.getElementById('news-loading').style.display='none';
+  if(!res.length) {
+    document.getElementById('news-res-list').innerHTML='<div style="text-align:center;padding:24px;color:var(--text3);font-size:12px">No se encontraron noticias recientes.<br>Probá con otro término o con el período "Último mes".</div>';
+    return;
+  }
+
+  window._newsRes = res;
+  document.getElementById('news-res-list').innerHTML = res.slice(0,8).map((n,i)=>`
+    <div class="nrc" id="nrc-${i}" onclick="togNews(${i})">
+      <div style="display:flex;align-items:flex-start;gap:8px">
+        <div style="flex:1;min-width:0">
+          <div style="font-size:12px;font-weight:500;margin-bottom:3px;line-height:1.4">${n.title}</div>
+          <div style="font-size:10px;color:var(--text2);margin-bottom:6px;line-height:1.5">${(n.description||'').substring(0,160)}</div>
+          <div style="display:flex;gap:0;align-items:center;flex-wrap:wrap;gap:8px">
+            <span style="display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:600;color:var(--text2);background:var(--bg4);padding:2px 7px;border-radius:4px">${n.source}</span>
+            ${n.date?`<span style="font-size:10px;color:var(--text3)">${n.date}</span>`:''}
+            ${n.url
+              ? `<a href="${n.url}" target="_blank" rel="noopener"
+                   style="font-size:10px;color:var(--accent2);font-weight:500;text-decoration:none;border-bottom:1px solid rgba(78,205,196,.3)"
+                   onclick="event.stopPropagation()" title="${n.url}">
+                   Ver artículo original →
+                 </a>`
+              : '<span style="font-size:10px;color:var(--text3);font-style:italic">Generado por IA — verificar fuente</span>'
+            }
+          </div>
+        </div>
+        <div id="nck-${i}" style="width:18px;height:18px;border-radius:50%;border:1px solid var(--border2);flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700"></div>
+      </div>
+    </div>`).join('');
+}
+
+function togNews(i) {
+  const n=window._newsRes?.[i]; if(!n)return;
+  const card=document.getElementById('nrc-'+i); const ck=document.getElementById('nck-'+i);
+  const idx=selNews_.findIndex(x=>x.title===n.title);
+  if(idx>-1){selNews_.splice(idx,1);card.classList.remove('seln');ck.textContent='';ck.style.background='';}
+  else{selNews_.push(n);card.classList.add('seln');ck.textContent='✓';ck.style.background='var(--accent2)';ck.style.color='var(--bg)';}
+  updNewsBanner();
+}
+function updNewsBanner(){
+  const b=document.getElementById('news-sel-banner');
+  if(selNews_.length){b.style.display='block';document.getElementById('news-sel-count').textContent=selNews_.length;}
+  else b.style.display='none';
+}
+
+// ══════════════════════════════════════════
+// QUESTIONS — fix #3: topic-contextual via AI
+// ══════════════════════════════════════════
+async function buildQs() {
+  const topic = document.getElementById('topic-in').value.trim();
+  const styleLabel = {storytelling:'Storytelling',valuebomb:'Value Bomb',opinion:'Opinión',informativo:'Informativo'}[selStyle_]||'Storytelling';
+  const container = document.getElementById('q-container');
+
+  container.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text3)"><div class="loader" style="margin:0 auto 8px"></div><div style="font-size:11px">Generando preguntas sobre tu tema...</div></div>';
+
+  const prov = getProv();
+  if(!prov) { container.innerHTML = genericQs(topic, styleLabel); return; }
+
+  try {
+    const raw = await prov.call(
+      `Sos un coach de contenido para LinkedIn. Un profesional quiere escribir un post estilo "${styleLabel}" sobre este tema: "${topic}".
+
+Generá 4 preguntas ESPECÍFICAS y CONCRETAS que le permitan enriquecer el post con detalles reales. Las preguntas deben referirse directamente a su tema, no ser genéricas.
+
+Respondé SOLO con JSON válido:
+{"questions":[{"label":"Etiqueta corta (3-4 palabras)","question":"Pregunta concreta y específica sobre el tema"}]}`,
+      prov.key
+    );
+    const m = raw.replace(/```json|```/g,'').trim().match(/\{[\s\S]*\}/);
+    const parsed = JSON.parse(m?m[0]:'{}');
+    if(parsed.questions?.length) {
+      // Store questions for suggest-answer feature
+      window._currentQs = parsed.questions;
+      container.innerHTML = parsed.questions.map((q,i) => renderQItem(q.label, q.question, i)).join('');
+    } else {
+      container.innerHTML = genericQs(topic, styleLabel);
+    }
+  } catch(e) {
+    container.innerHTML = genericQs(topic, styleLabel);
+  }
+}
+
+function renderQItem(label, question, i) {
+  return `
+    <div class="qitem" id="qitem-${i}">
+      <div class="qlbl">${label}</div>
+      <div class="qtxt">${question}</div>
+      <div style="position:relative">
+        <textarea class="fta" id="qa-${i}" placeholder="Escribí tu respuesta o usá ✦ Sugerir para que la IA proponga una..." style="min-height:70px;font-size:12px;padding-bottom:32px"></textarea>
+        <button class="btn btn-ghost btn-sm" onclick="suggestAnswer(${i})" id="qsug-btn-${i}"
+          style="position:absolute;bottom:8px;right:8px;font-size:10px;padding:3px 8px;color:var(--accent2);border-color:rgba(78,205,196,.3)">
+          ✦ Sugerir respuesta
+        </button>
+      </div>
+      <div id="qsug-${i}" style="display:none;margin-top:6px;background:rgba(78,205,196,.06);border:1px solid rgba(78,205,196,.15);border-radius:6px;padding:10px">
+        <div style="font-size:10px;color:var(--accent2);font-weight:600;margin-bottom:5px">Respuesta sugerida por IA — editá o usá directamente:</div>
+        <div id="qsug-text-${i}" style="font-size:12px;color:var(--text2);line-height:1.6;margin-bottom:8px"></div>
+        <div style="display:flex;gap:5px">
+          <button class="btn btn-primary btn-sm" onclick="useSuggestion(${i})">Usar esta respuesta</button>
+          <button class="btn btn-ghost btn-sm" onclick="suggestAnswer(${i})">↺ Otra sugerencia</button>
+          <button class="btn btn-ghost btn-sm" onclick="document.getElementById('qsug-${i}').style.display='none'">Cerrar</button>
+        </div>
+      </div>
+      <div class="qopt">Opcional — la IA completará con su criterio si lo dejás en blanco.</div>
+    </div>`;
+}
+
+function genericQs(topic, style) {
+  const qs = [
+    {l:'Hook / Atención', q:`Para el post sobre "${topic.substring(0,60)}": ¿cuál es el dato más sorprendente o el momento más memorable que podría capturar la atención en las primeras líneas?`},
+    {l:'Contexto / Problema', q:`¿Cuál era la situación o desafío inicial antes de lo que contás? ¿Qué problema existía que hacía que esto importara?`},
+    {l:'Transformación / Resultado', q:`¿Qué lograste, cambió o aprendiste? Idealmente con números, métricas o ejemplos concretos.`},
+    {l:'CTA / Cierre', q:`¿Qué querés que haga o piense el lector al terminar de leer el post?`}
+  ];
+  window._currentQs = qs.map(q => ({label:q.l, question:q.q}));
+  return qs.map((q,i) => renderQItem(q.l, q.q, i)).join('');
+}
+
+// ── Suggest answer for a question ─────────────────────────────────────────
+async function suggestAnswer(i) {
+  const prov = getProv(); if(!prov) { toast('Configurá una API key primero'); return; }
+  const topic    = document.getElementById('topic-in').value.trim();
+  const question = window._currentQs?.[i]?.question || '';
+  const profId   = document.getElementById('fl-prof-sel')?.value||'';
+  const prof     = getProfs().find(p=>p.id===profId);
+  const existing = document.getElementById('qa-'+i)?.value||'';
+
+  const btn = document.getElementById('qsug-btn-'+i);
+  const box = document.getElementById('qsug-'+i);
+  const txt = document.getElementById('qsug-text-'+i);
+
+  // Show loading state
+  if(btn) { btn.textContent='Generando...'; btn.disabled=true; }
+  box.style.display='block';
+  txt.textContent='';
+  txt.innerHTML='<div class="loader" style="width:16px;height:16px;border-width:1.5px;margin:6px auto"></div>';
+
+  try {
+    const raw = await prov.call([
+      `Sos un consultor de contenido para LinkedIn ayudando a ${prof?prof.name:'un profesional'} a escribir un post sobre: "${topic}".`,
+      '',
+      `La pregunta para enriquecer el post es: "${question}"`,
+      existing ? `El usuario ya escribió esto: "${existing}" — expandí o mejorá esa respuesta.` : '',
+      '',
+      `Generá UNA respuesta concreta, en primera persona, de 2-4 oraciones, como si fuera el propio autor respondiendo.`,
+      `La respuesta debe ser específica al tema, no genérica. Incluí detalles reales o plausibles que la IA pueda usar para el post.`,
+      `Respondé SOLO con el texto de la respuesta, sin comillas, sin intro, sin explicación.`
+    ].filter(Boolean).join('\n'), prov.key);
+
+    txt.textContent = raw.trim();
+    if(btn) { btn.textContent='✦ Sugerir respuesta'; btn.disabled=false; }
+  } catch(e) {
+    txt.textContent = 'Error al generar. Intentá de nuevo.';
+    if(btn) { btn.textContent='✦ Sugerir respuesta'; btn.disabled=false; }
+  }
+}
+
+function useSuggestion(i) {
+  const txt = document.getElementById('qsug-text-'+i)?.textContent||'';
+  const ta  = document.getElementById('qa-'+i);
+  if(ta && txt) {
+    ta.value = txt;
+    document.getElementById('qsug-'+i).style.display='none';
+    toast('Respuesta aplicada — podés editarla');
+  }
+}
+
+// ── Suggest post topics from trends ────────────────────────────────────────
+async function suggestTopics() {
+  const prov = getProv();
+  if(!prov) { toast('Configurá una API key primero'); return; }
+
+  const profId = document.getElementById('fl-prof-sel')?.value||'';
+  const prof   = getProfs().find(p=>p.id===profId);
+  const currentTopic = document.getElementById('topic-in')?.value||'';
+
+  const loadEl  = document.getElementById('topic-suggestions-loading');
+  const listEl  = document.getElementById('topic-suggestions-list');
+  const wrapEl  = document.getElementById('topic-suggestions');
+  const btn     = document.getElementById('suggest-topics-btn');
+
+  wrapEl.style.display='block';
+  loadEl.style.display='block';
+  listEl.innerHTML='';
+  btn.textContent='Generando...'; btn.disabled=true;
+
+  // Build context from profile and any existing news
+  const newsContext = window._newsRes?.length
+    ? 'Noticias recientes disponibles:\n' + window._newsRes.slice(0,4).map(n=>`- ${n.title} (${n.source})`).join('\n')
+    : '';
+
+  const profContext = prof
+    ? `Industria: ${prof.industry||'general'}. Audiencia: ${prof.audience||'profesionales'}. Expertise: ${prof.topics||''}.`
+    : 'Profesional de negocios y tecnología.';
+
+  try {
+    const raw = await prov.call([
+      `Sos un estratega de contenido para LinkedIn. Tu trabajo es proponer temas de post frescos, relevantes y con potencial de engagement.`,
+      '',
+      `Perfil del autor: ${profContext}`,
+      newsContext,
+      currentTopic ? `El autor tiene en mente este tema base: "${currentTopic}"` : '',
+      '',
+      `Proponé 5 ideas de post concretas y diferenciadas. Cada idea debe tener:`,
+      `- Un ángulo específico (no genérico)`,
+      `- Un tipo de post sugerido (storytelling, opinión, valor, caso de éxito, predicción)`,
+      `- Suficiente detalle para que el autor sepa exactamente de qué se trataría el post`,
+      '',
+      `Respondé SOLO con JSON válido:`,
+      `{"topics":[{"title":"Título corto del tema","angle":"El ángulo específico del post","type":"tipo de post","description":"1-2 oraciones explicando de qué trataría el post y por qué generaría engagement"}]}`
+    ].filter(Boolean).join('\n'), prov.key);
+
+    const m = raw.replace(/```json|```/g,'').trim().match(/\{[\s\S]*\}/);
+    const parsed = JSON.parse(m?m[0]:'{}');
+    loadEl.style.display='none';
+
+    if(parsed.topics?.length) {
+      const typeColors = {
+        storytelling:'var(--amber)', opinión:'var(--accent3)', valor:'var(--accent)',
+        'caso de éxito':'var(--success)', predicción:'var(--accent2)'
+      };
+      listEl.innerHTML = parsed.topics.map((t,i) => {
+        const color = typeColors[t.type?.toLowerCase()] || 'var(--text2)';
+        return `
+          <div style="border:1px solid var(--border);border-radius:8px;padding:12px;background:var(--surface);cursor:pointer;transition:border-color .15s"
+               onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'"
+               onclick="useTopicSuggestion(${JSON.stringify(t.description+' '+t.title)})">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px">
+              <div style="font-size:12px;font-weight:600;flex:1">${t.title}</div>
+              <span style="font-size:9px;padding:2px 6px;border-radius:4px;background:rgba(255,255,255,.06);color:${color};font-weight:600;white-space:nowrap">${t.type}</span>
+            </div>
+            <div style="font-size:11px;color:var(--text2);line-height:1.5;margin-bottom:6px">${t.description}</div>
+            <div style="font-size:10px;color:var(--accent);font-weight:500">← Hacer clic para usar este tema</div>
+          </div>`;
+      }).join('');
+    } else {
+      listEl.innerHTML = '<div style="font-size:11px;color:var(--text3);padding:10px">No se pudieron generar sugerencias. Intentá de nuevo.</div>';
+    }
+  } catch(e) {
+    loadEl.style.display='none';
+    listEl.innerHTML = `<div style="font-size:11px;color:var(--accent3);padding:10px">Error: ${e.message}</div>`;
+  }
+
+  btn.textContent='↺ Regenerar sugerencias'; btn.disabled=false;
+}
+
+function useTopicSuggestion(text) {
+  // Go back to step 1 and fill the topic field
+  goStep(1, true);
+  setTimeout(()=>{
+    const ta = document.getElementById('topic-in');
+    if(ta){ ta.value=text.trim(); ta.focus(); }
+    toast('Tema aplicado — completá los detalles y avanzá');
+  }, 80);
+}
+
+// ══════════════════════════════════════════
+// GENERATION — fix #4 #5: robust, full text, editable
+// ══════════════════════════════════════════
+async function runGen() {
+  const prov = getProv(); if(!prov) return;
+  document.getElementById('gen-load').classList.add('vis');
+  document.getElementById('gen-res').style.display='none';
+
+  const topic      = document.getElementById('topic-in').value.trim();
+  const extra      = document.getElementById('extra-ctx')?.value||'';
+  const styleLabel = {storytelling:'Storytelling',valuebomb:'Value Bomb',opinion:'Opinión',informativo:'Informativo'}[selStyle_]||'Storytelling';
+  const lenSpec = {
+    short:  {words:'150 palabras',  min:140, note:'Post flash. Directo al punto. Sin desarrollo extenso — solo impacto y CTA.'},
+    medium: {words:'300 palabras',  min:280, note:'Extensión estándar de LinkedIn. Suficiente para desarrollar una idea con contexto y cierre.'},
+    long:   {words:'600 palabras',  min:560, note:'Post extendido. Desarrollá el contexto, el conflicto, la solución y la reflexión con detalle real.'},
+    xlong:  {words:'800 palabras',  min:750, note:'Artículo largo. Incluí situación inicial, desarrollo con detalles específicos, aprendizajes y cierre con pregunta. Podés usar subtítulos en negrita para separar secciones.'}
+  }[selLen_] || {words:'300 palabras', min:280, note:'Extensión estándar de LinkedIn.'};
+
+  // Collect answers — check if elements exist (might not if AI questions hadn't loaded)
+  const answers = [0,1,2,3].map(i=>{
+    const el=document.getElementById('qa-'+i);
+    return el ? el.value.trim() : '';
+  }).filter(Boolean);
+
+  // ── BUILD DYNAMIC PROMPT FROM ACTIVE PROFILE ─────────────────────────────
+  // Rol: constructed from profile fields, not hardcoded
+  const profId = document.getElementById('fl-prof-sel')?.value||'';
+  const prof   = getProfs().find(p=>p.id===profId);
+
+  // Determine context for the AI role description
+  const industry  = prof?.industry  || 'negocios y tecnología';
+  const region    = prof?.region    || '';  // empty = no region assumption
+  const audience  = prof?.audience  || 'profesionales';
+  const profType  = prof?.profileType || 'personal';
+
+  // Role sentence adapts to profile type and region
+  const regionNote = region ? ` con foco en ${region}` : '';
+  const roleByType = {
+    personal:  `Sos un experto en copywriting para LinkedIn que escribe en nombre de un profesional individual. Tu especialidad es crear posts auténticos que reflejen la voz humana y la experiencia real de la persona${regionNote}.`,
+    company:   `Sos un experto en content marketing B2B para LinkedIn que escribe en nombre de una empresa o marca. Tu especialidad es crear posts que posicionen a la empresa como referente en su sector${regionNote}, sin sonar corporativos ni genéricos.`,
+    thought:   `Sos un experto en personal branding para LinkedIn que escribe en nombre de un thought leader. Tu especialidad es crear posts que generen debate, posicionen una perspectiva clara y construyan autoridad en el sector${regionNote}.`
+  };
+  const dynamicRole = roleByType[profType] || roleByType.personal;
+
+  // Profile context block — only populated if profile exists
+  let profCtx = '';
+  if(prof) {
+    const typeLabels = { personal:'Profesional individual', company:'Empresa / marca', thought:'Thought leader' };
+    profCtx = [
+      '',
+      '══ PERFIL ACTIVO (seguí esto estrictamente) ══',
+      `Nombre: ${prof.name}`,
+      prof.role     ? `Cargo: ${prof.role}`         : '',
+      prof.industry ? `Industria: ${prof.industry}`  : '',
+      prof.region   ? `Región/mercado: ${prof.region}` : '',
+      `Tipo de perfil: ${typeLabels[profType]||profType}`,
+      prof.audience ? `Audiencia objetivo: ${prof.audience}` : '',
+      prof.tones?.length ? `Tonos a usar: ${prof.tones.join(', ')}` : '',
+      prof.voice    ? `Voz y estilo: ${prof.voice}`  : '',
+      prof.topics   ? `Temas de expertise: ${prof.topics}` : '',
+      prof.avoid    ? `PROHIBIDO / evitar siempre: ${prof.avoid}` : '',
+      prof.examples ? `\nEJEMPLOS REALES DE POSTS DE ESTE PERFIL — aprendé la voz exactamente:\n${prof.examples.substring(0,1000)}` : ''
+    ].filter(Boolean).join('\n');
+  }
+
+  // Rules — base rules + profile-specific additions
+  const baseRules = [
+    '- Hook potente y ÚNICO en las primeras 1-2 líneas (antes del "ver más") — arranque radicalmente distinto en cada post',
+    '- EXTENSIÓN OBLIGATORIA: ' + lenSpec.words + '. ' + lenSpec.note,
+    '- Saltos de línea naturales para facilitar lectura en móvil (\\n en el JSON)',
+    '- Máximo 2-3 emojis salvo que el perfil indique otro criterio',
+    '- Terminá con CTA o pregunta que invite a conversación',
+  ];
+
+  // Add profile-type specific rules
+  const typeRules = {
+    personal: [
+      '- Primera persona singular ("yo", "mi", "me pasó")',
+      '- Experiencias y ejemplos reales y concretos, no genéricos',
+      prof ? '- Mantené estrictamente la voz del perfil' : '- Voz auténtica de profesional con experiencia real',
+    ],
+    company: [
+      '- Voz de marca: plural o impersonal ("en [empresa] creemos", "nuestro equipo")',
+      '- Enfocado en valor para el cliente / mercado, no en la empresa misma',
+      '- Sin primera persona singular — hablá como marca, no como individuo',
+      prof ? '- Seguí el estilo de comunicación definido en el perfil' : '',
+    ],
+    thought: [
+      '- Primera persona con posición clara y opinión fuerte',
+      '- Puede ser controversial — un thought leader no teme el debate',
+      '- Cada post debe dejar una idea memorable o un punto de vista único',
+      prof ? '- Usá la voz y el estilo del perfil como referencia' : '',
+    ]
+  };
+  const allRules = [...baseRules, ...(typeRules[profType]||typeRules.personal)].filter(Boolean);
+
+  // News context — fix #4: clean serialization
+  let newsCtx = '';
+  if(selNews_.length) {
+    const newsLines = selNews_.map(n=>`• "${n.title}" (${n.source}${n.date?', '+n.date:''})`).join('\n');
+    newsCtx = `\n\nNOTICIAS ACTUALES A INCORPORAR (usá 1-2 como contexto o dato de apoyo, no las listes textualmente):\n${newsLines}`;
+  }
+
+  const msgs = ['Analizando tu tema...','Aplicando perfil de voz...','Generando los 3 posts...','Ajustando hooks...'];
+  let mi=0; const iv=setInterval(()=>{document.getElementById('gen-load-msg').textContent=msgs[mi=(mi+1)%msgs.length];},1000);
+
+  // fix #4: clean prompt with no escaping issues
+  const answerBlock = answers.length
+    ? '\n\nRESPUESTAS DEL AUTOR:\n' + ['Hook','Contexto','Valor','CTA'].map((l,i)=>answers[i]?l+': '+answers[i]:'').filter(Boolean).join('\n')
+    : '';
+
+  // Random seed words to force variation across regenerations
+  const variationSeeds = [
+    ['apertura directa','anécdota específica','pregunta retórica'],
+    ['dato concreto','paradoja','confesión profesional'],
+    ['frase provocativa','escena del momento','insight contraintuitivo'],
+    ['estadística sorprendente','diálogo real','declaración polémica'],
+    ['metáfora inesperada','error cometido','comparación inusual']
+  ];
+  const seedIdx = Math.floor(Math.random() * variationSeeds.length);
+  const seeds = variationSeeds[seedIdx];
+  const variationNote = `VARIACIÓN OBLIGATORIA: Esta generación debe ser COMPLETAMENTE DISTINTA a cualquier generación anterior. Usá estos arranques para cada post respectivamente: Post 1 debe abrir con ${seeds[0]}, Post 2 con ${seeds[1]}, Post 3 con ${seeds[2]}. Nunca repitas frases, estructuras ni hooks ya usados.`;
+
+  // ── AUTO-FETCH SUPPORTING DATA before generating ─────────────────────────
+  // Pull real context from news already fetched, or use profile knowledge
+  let dataCtx = '';
+  if(window._newsRes?.length) {
+    // Use up to 4 news items as data backbone — both selected and unselected
+    const dataPool = [...selNews_, ...window._newsRes.filter(n => !selNews_.find(s=>s.title===n.title))].slice(0,4);
+    dataCtx = dataPool.map(n=>`• ${n.title} (${n.source}${n.date?', '+n.date:''})`).join('\n');
+  }
+
+  // ── PROMPT: quality-first, analytical depth ───────────────────────────────
+  const authorName = prof ? (prof.role ? `${prof.name}, ${prof.role}` : prof.name) : 'el autor';
+  const isCompany  = profType === 'company';
+
+  // Core identity line
+  const identityLine = isCompany
+    ? `Escribí en nombre de: ${authorName} (empresa/marca).`
+    : `Escribí en nombre de: ${authorName}.`;
+
+  // Who the author is — credentials that make them credible on this topic
+  const credentialParts = [
+    prof?.role     ? prof.role     : '',
+    prof?.industry ? `sector ${prof.industry}` : '',
+    prof?.region   ? prof.region   : '',
+    prof?.topics   ? `expertise en ${prof.topics}` : '',
+  ].filter(Boolean).join(', ');
+
+  // What makes this post worth reading
+  const depthInstruction = `
+NIVEL DE ANÁLISIS REQUERIDO:
+El post debe demostrar que el autor tiene una perspectiva propia y sofisticada, no solo conocimiento genérico del tema.
+Antes de escribir, identificá mentalmente: ¿qué sabe este autor que la mayoría no sabe? ¿Qué observación concreta, dato específico o experiencia real hace que este post valga la pena leer?
+Asumí que la audiencia es profesional y sofisticada — no expliques conceptos básicos, no definas lo que todos saben.
+Si hay datos disponibles, usálos. Si no, usá estimaciones plausibles presentadas como tales.
+Un post con un dato concreto y una perspectiva clara vale diez veces más que uno con generalidades bien escritas.`;
+
+  // Voice instruction — clean, not restrictive
+  const voiceInstruction = prof?.voice
+    ? `Voz y estilo: ${prof.voice}`
+    : `Voz: conversacional y directa. Como una persona inteligente que escribe como habla, no como una IA generando contenido corporativo.`;
+
+  // Length — firm but not mechanical
+  const lenInstruction = `Extensión: ${lenSpec.words} aproximadamente (mínimo ${lenSpec.min} palabras reales, no relleno). ${lenSpec.note}`;
+
+  // Structure — principles not rules
+  const structureInstruction = `
+ESTRUCTURA:
+- Las primeras 1-2 líneas son decisivas. Empezá con una tensión, un dato sorprendente, una escena concreta o una afirmación que rompa el patrón. Nunca con una generalización ni una definición.
+- El desarrollo aporta perspectiva propia, no solo información. Conectá el tema con implicancias reales para la audiencia.
+- El cierre deja algo para pensar — una pregunta genuina, una predicción, una invitación al debate. No un resumen moral.
+- 3 a 5 hashtags al final en línea separada, fuera del cuerpo del texto.
+- Párrafos cortos. Sin bullets ni listas. Sin subtítulos dentro del texto.`;
+
+  // Avoid list — focused on what actually degrades quality
+  const avoidProfile = prof?.avoid ? `\nTambién evitar específicamente: ${prof.avoid}` : '';
+  const avoidInstruction = `
+PROHIBIDO:
+- Empezar con generalización, definición o pregunta retórica genérica tipo "¿Sabías que...?"
+- Frases hechas de IA: "en el mundo actual", "es fundamental", "debemos tener en cuenta", "en este contexto"
+- Negación seguida de afirmación: "No se trata de X, sino de Y"
+- Cierre con moraleja explícita o frase grandilocuente
+- Listar puntos con guiones o bullets
+- Describir lo que vas a decir en lugar de decirlo${avoidProfile}`;
+
+  // Profile examples — the most powerful signal
+  const examplesSection = prof?.examples
+    ? `\nEJEMPLOS DE POSTS REALES DEL AUTOR (aprendé exactamente esta voz — ritmo, vocabulario, longitud de párrafos, forma de razonar):\n${prof.examples.substring(0,1200)}`
+    : '';
+
+  // Profile tones
+  const toneSection = prof?.tones?.length
+    ? `Tonos: ${prof.tones.join(', ')}.`
+    : '';
+
+  // Data available
+  const dataSection = dataCtx
+    ? `\nDATOS Y CONTEXTO DISPONIBLE (usá los que aporten al argumento, citando fuente entre paréntesis):\n${dataCtx}`
+    : '';
+
+  // User-provided details
+  const detailSection = answers.length
+    ? `\nDETALLES DEL AUTOR PARA INCLUIR:\n${answers.map((a,i)=>(['Hook','Contexto','Valor','CTA'][i]||'Dato')+': '+a).join('\n')}`
+    : '';
+
+  // Extra context
+  const extraSection = extra ? `Contexto específico del caso: ${extra}` : '';
+
+  // Type-specific instruction
+  const typeNote = {
+    personal:  'Escribí en primera persona. Anclá el argumento en experiencia propia concreta.',
+    company:   'Voz de marca. Plural o impersonal. Enfocado en valor para el mercado, no en la empresa.',
+    thought:   'Posición clara y propia. No neutral. Un thought leader tiene una opinión y la defiende.'
+  }[profType] || '';
+
+  // Variation to avoid repetition
+  const variationInstruction = `Los 3 posts deben tener APERTURAS RADICALMENTE DISTINTAS: Post 1 abre con ${seeds[0]}, Post 2 con ${seeds[1]}, Post 3 con ${seeds[2]}.`;
+
+  const prompt = [
+    `Sos un escritor de contenido para LinkedIn de nivel senior. Tu trabajo es crear posts que la gente guarda, comparte y comenta — no posts que suenan bien pero no dicen nada.`,
+    '',
+    `══ QUIÉN ESCRIBE ══`,
+    identityLine,
+    credentialParts ? `Credenciales: ${credentialParts}.` : '',
+    toneSection,
+    voiceInstruction,
+    typeNote,
+    examplesSection,
+    '',
+    `══ QUÉ ESCRIBIR ══`,
+    `Tema: ${topic}`,
+    `Estilo de post: ${styleLabel} — ${{Storytelling:'historia real con tensión y resolución', 'Value Bomb':'perspectiva analítica con aprendizajes que sorprenden', Opinión:'posición clara y defendible que puede incomodar', Informativo:'análisis con datos concretos e implicancias no obvias'}[styleLabel]||styleLabel}`,
+    extraSection,
+    detailSection,
+    dataSection,
+    '',
+    depthInstruction,
+    '',
+    `══ CÓMO ESCRIBIRLO ══`,
+    lenInstruction,
+    structureInstruction,
+    avoidInstruction,
+    '',
+    variationInstruction,
+    '',
+    `══ FORMATO DE RESPUESTA ══`,
+    'Generá EXACTAMENTE 3 variantes. Respondé ÚNICAMENTE con JSON válido. Sin texto antes ni después.',
+    `Cada variante es un post COMPLETO — el campo "body" contiene todo el texto incluyendo inicio, desarrollo, cierre y hashtags. Sin títulos ni encabezados dentro del post.`,
+    '',
+    '{"posts":[{"style":"'+styleLabel+'","hook":"primeras 1-2 líneas exactas del post (para preview)","body":"post completo con \\n\\n entre párrafos y hashtags al final"},{"style":"Value Bomb","hook":"primeras 1-2 líneas","body":"post completo"},{"style":"Opinión","hook":"primeras 1-2 líneas","body":"post completo"}]}'
+  ].filter(x => x !== undefined && x !== '').join('\n');
+
+  try {
+    const raw = await prov.call(prompt, prov.key);
+    clearInterval(iv);
+
+    // Robust JSON extraction
+    let parsed;
+    try {
+      const clean = raw.replace(/```json|```/g,'').trim();
+      const match = clean.match(/\{[\s\S]*\}/);
+      parsed = JSON.parse(match ? match[0] : clean);
+    } catch(e) {
+      parsed = {posts:[]};
+    }
+
+    const sc = {Storytelling:'gstory','Value Bomb':'gvalue',Opinión:'gopin',Informativo:'gvalue'};
+    const grid = document.getElementById('gen-grid');
+
+    if(!parsed.posts?.length) {
+      grid.innerHTML = `<div style="color:var(--accent3);font-size:12px;padding:16px;grid-column:span 3">
+        No se pudo parsear la respuesta. Intentá de nuevo.<br>
+        <details style="margin-top:8px"><summary style="cursor:pointer;font-size:10px;color:var(--text3)">Ver respuesta recibida</summary>
+        <pre style="font-size:9px;margin-top:6px;white-space:pre-wrap;color:var(--text3);max-height:200px;overflow:auto">${raw.substring(0,600)}</pre></details>
+        <button class="btn btn-ghost btn-sm" style="margin-top:10px" onclick="goStep(3)">← Volver y reintentar</button>
+      </div>`;
+    } else {
+      // Build cards — each with full post visible + inline editor per card
+      const sc = {Storytelling:'gstory','Value Bomb':'gvalue',Opinión:'gopin',Informativo:'gvalue'};
+      grid.innerHTML = parsed.posts.map((p,i) => {
+        const badge = sc[p.style]||'gvalue';
+        const safe = s => (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        // body is the COMPLETE post — hook is only used for history/metadata, not shown separately
+        const fullText = safe(p.body||'');
+        return `
+        <div class="gencard" id="gc-${i}">
+          <div class="gen-card-header">
+            <span class="gbadge ${badge}">${p.style}</span>
+            <div style="display:flex;gap:5px;margin-left:auto;flex-shrink:0">
+              <button class="btn btn-primary btn-sm" onclick="copyPostCard(${i})">⎘ Copiar</button>
+              <button class="btn btn-ghost btn-sm" onclick="toggleCardEditor(${i})">✏ Editar</button>
+              <button class="btn btn-ghost btn-sm" onclick="saveDraftCard(${i})" title="Guardar en Mis Posts → Borradores">💾</button>
+            </div>
+          </div>
+          <div class="gen-card-body" id="gcbody-${i}">${fullText}</div>
+          <div class="gen-card-editor" id="gced-${i}">
+            <textarea id="gcta-${i}" oninput="updateCardCharCount(${i})">${fullText}</textarea>
+            <div class="gen-card-editor-actions">
+              <button class="btn btn-primary btn-sm" onclick="copyPostCard(${i})">⎘ Copiar para LinkedIn</button>
+              <button class="btn btn-ghost btn-sm" onclick="saveDraftCard(${i})">💾 Guardar borrador</button>
+              <button class="btn btn-success btn-sm" onclick="pubFromCard(${i})">✓ Marcar publicado</button>
+              <button class="btn btn-ghost btn-sm" style="margin-left:auto" onclick="toggleCardEditor(${i})">Cerrar</button>
+              <span style="font-size:10px;color:var(--text3);margin-left:6px" id="gccc-${i}"></span>
+            </div>
+          </div>
+        </div>`;
+      }).join('');
+
+      window._genPosts = parsed.posts.map(p => ({...p}));
+
+      // Save to history
+      CU.generated = (CU.generated||0) + 3;
+      CU.history = CU.history||[];
+      const profName = prof ? prof.name : '';
+      parsed.posts.forEach(p => {
+        CU.history.push({
+          hook: (p.hook||'Post generado').substring(0,80),
+          body: p.body||'',
+          style: p.style,
+          time: nowStr(),
+          ts: Date.now(),
+          provider: prov.name,
+          topic: topic.substring(0,80),
+          profile: profName
+        });
+      });
+      saveCU(); refreshAll();
+    }
+
+  } catch(err) {
+    clearInterval(iv);
+    const errMsg = err.message || 'Sin respuesta del servidor';
+    const hint = errMsg.includes('401') || errMsg.includes('invalid_api_key') || errMsg.includes('Unauthorized')
+      ? 'Key incorrecta o revocada — verificá en la página de API Keys.'
+      : errMsg.includes('429') || errMsg.includes('rate') || errMsg.includes('quota') || errMsg.includes('tokens')
+      ? 'Cuota o límite de rate agotado — esperá unos minutos o usá otro modelo.'
+      : errMsg.includes('model') ? 'El modelo no está disponible en tu plan o región.'
+      : 'Verificá tu conexión o probá con otro modelo.';
+    document.getElementById('gen-grid').innerHTML = `
+      <div style="color:var(--accent3);font-size:12px;padding:18px;background:rgba(255,107,107,.05);border-radius:9px">
+        <div style="font-size:13px;font-weight:600;margin-bottom:6px">✗ Error con ${prov.name}</div>
+        <div style="font-size:11px;color:var(--text2);margin-bottom:4px;word-break:break-all">${errMsg}</div>
+        <div style="font-size:11px;color:var(--text3);margin-bottom:12px">${hint}</div>
+        <div style="display:flex;gap:7px;flex-wrap:wrap">
+          <button class="btn btn-ghost btn-sm" onclick="navigate('api-settings',null)">⚙ Revisar API Keys</button>
+          <button class="btn btn-ghost btn-sm" onclick="regenPosts()">↺ Reintentar</button>
+          <button class="btn btn-ghost btn-sm" onclick="goStep(3)">← Volver</button>
+        </div>
+      </div>`;
+  }
+
+  document.getElementById('gen-load').classList.remove('vis');
+  document.getElementById('gen-res').style.display='block';
+}
+
+// Regenerate — same topic, different variation seed
+function regenPosts() {
+  document.getElementById('gen-load').classList.add('vis');
+  document.getElementById('gen-res').style.display='none';
+  runGen();
+}
+
+// ── Per-card inline editor ────────────────────────────────────────────────────
+function toggleCardEditor(i) {
+  const ed   = document.getElementById('gced-'+i);
+  const body = document.getElementById('gcbody-'+i);
+  const card = document.getElementById('gc-'+i);
+  const isOpen = ed && ed.style.display === 'block';
+  // Close all editors first
+  document.querySelectorAll('.gen-card-editor').forEach(e => e.style.display='none');
+  document.querySelectorAll('.gen-card-body').forEach(b => b.style.display='block');
+  document.querySelectorAll('.gencard').forEach(c => c.classList.remove('selp'));
+  if (!isOpen) {
+    ed.style.display = 'block';
+    body.style.display = 'none';
+    card.classList.add('selp');
+    const ta = document.getElementById('gcta-'+i);
+    if(ta) { ta.value = window._genPosts?.[i]?.body || ''; updateCardCharCount(i); ta.focus(); }
+  }
+}
+
+function updateCardCharCount(i) {
+  const ta = document.getElementById('gcta-'+i);
+  const cc = document.getElementById('gccc-'+i);
+  if(ta && cc) cc.textContent = ta.value.length + ' / 3000';
+  if(window._genPosts?.[i]) window._genPosts[i].body = ta.value;
+}
+
+function copyPostCard(i) {
+  // Get text: from textarea if editor is open, otherwise from stored data
+  const editorDiv = document.getElementById('gced-'+i);
+  const ta        = document.getElementById('gcta-'+i);
+  const editorOpen = editorDiv && editorDiv.style.display === 'block';
+  const text = (editorOpen && ta) ? ta.value : (window._genPosts?.[i]?.body || '');
+
+  if(!text){ toast('No hay texto para copiar'); return; }
+
+  // Try modern clipboard API first, then legacy fallback
+  if(navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(text)
+      .then(() => toast('⎘ Copiado — pegalo en LinkedIn'))
+      .catch(() => legacyCopy(text));
+  } else {
+    legacyCopy(text);
+  }
+}
+
+function legacyCopy(text) {
+  const tmp = document.createElement('textarea');
+  tmp.value = text;
+  tmp.style.cssText = 'position:fixed;left:-9999px;top:-9999px;opacity:0';
+  document.body.appendChild(tmp);
+  tmp.focus(); tmp.select();
+  try {
+    document.execCommand('copy');
+    toast('⎘ Copiado — pegalo en LinkedIn');
+  } catch(e) {
+    toast('Error al copiar. Seleccioná el texto manualmente.');
+  }
+  document.body.removeChild(tmp);
+}
+
+function saveDraftCard(i) {
+  const ta = document.getElementById('gcta-'+i);
+  const edOpen = document.getElementById('gced-'+i)?.style.display === 'block';
+  const body = edOpen && ta ? ta.value.trim() : (window._genPosts?.[i]?.body||'').trim();
+  const style = window._genPosts?.[i]?.style || 'Post';
+  if(!body){toast('El post está vacío');return;}
+  CU.drafts = CU.drafts||[];
+  CU.drafts.push({body, style, hook:body.substring(0,80), time:nowStr()});
+  saveCU(); refreshAll();
+  toast('💾 Guardado en Mis Posts → Borradores');
+}
+
+function pubFromCard(i) {
+  const ta = document.getElementById('gcta-'+i);
+  const edOpen = document.getElementById('gced-'+i)?.style.display === 'block';
+  const body = edOpen && ta ? ta.value.trim() : (window._genPosts?.[i]?.body||'').trim();
+  const style = window._genPosts?.[i]?.style || 'Post';
+  if(!body){toast('El post está vacío');return;}
+  CU.published = CU.published||[];
+  CU.published.push({body, style, hook:body.substring(0,80), time:nowStr()});
+  saveCU(); refreshAll();
+  toast('✓ Marcado como publicado');
+}
+
+// Legacy stubs
+function selPost(){}
+function saveDraftEd(){ saveDraftCard(0); }
+function pubFromEd(){ pubFromCard(0); }
+function copyPost(){ copyPostCard(0); }
+function updCharCt(){}
+
+function copyStr(s) {
+  navigator.clipboard.writeText(s).then(()=>toast('⎘ Copiado ✓')).catch(()=>{});
+}
+
+function qkDraft(body,style) {
+  CU.drafts=CU.drafts||[];
+  CU.drafts.push({body,style,hook:body.substring(0,80),time:nowStr()});
+  saveCU(); refreshAll(); toast('💾 Borrador guardado');
+}
+
+// ══════════════════════════════════════════
+// UTILS
+// ══════════════════════════════════════════
+function nowStr() { return new Date().toLocaleString('es-AR',{dateStyle:'short',timeStyle:'short'}); }
+function toast(msg) {
+  const el=document.getElementById('toast');
+  el.textContent=msg; el.style.display='block';
+  clearTimeout(window._tt);
+  window._tt=setTimeout(()=>{el.style.display='none';},2600);
+}
+
+// MODAL BACKDROP CLOSE — only closes when clicking the dark overlay itself, not the modal content
+document.getElementById('prof-modal').addEventListener('click', e => {
+  if(e.target === e.currentTarget) {
+    if(confirm('¿Cerrar sin guardar los cambios?')) closeProfModal();
+  }
+});
+document.getElementById('hist-modal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeHistModal();});
+
+// BOOT
+tryAutoLogin();
+</script>
+</body>
+</html>
